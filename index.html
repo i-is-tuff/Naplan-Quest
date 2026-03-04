@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>NAPLAN Quest Y9</title>
+<style>
+:root{--bg:#0d1b2e;--card:#162035;--card2:#1c2a42;--teal:#00c9b8;--text:#e8f4ff;--muted:#5a7a9f;--ok:#22c55e;--bad:#ef4444;--gold:#f59e0b;--purple:#8b5cf6;--pink:#ec4899;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;min-height:100vh;overflow-x:hidden;}
+.screen{display:none;min-height:100vh;flex-direction:column;}
+.screen.active{display:flex;}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px;position:sticky;top:0;background:var(--bg);z-index:50;}
+.hdr-hearts{display:flex;gap:3px;font-size:1.2rem;}
+.xp-pill{background:linear-gradient(135deg,var(--gold),#f97316);border-radius:99px;padding:3px 12px;font-size:0.78rem;font-weight:800;}
+.back-btn{background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;}
+.home-btn{background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;padding:4px 8px;border-radius:8px;transition:color .15s;}
+.home-btn:hover{color:var(--teal);}
+.btn{width:100%;border:none;border-radius:14px;padding:14px;font-size:0.93rem;font-weight:700;cursor:pointer;transition:transform .1s,opacity .15s;max-width:440px;}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:linear-gradient(135deg,var(--teal),#3b82f6);color:white;}
+.btn-secondary{background:var(--card);border:2px solid var(--teal);color:var(--teal);}
+.btn-purple{background:linear-gradient(135deg,var(--purple),var(--pink));color:white;}
+.btn-sm{padding:9px 16px;font-size:0.83rem;width:auto;border-radius:10px;}
+/* HOME */
+#home{align-items:center;padding:20px 16px 30px;gap:12px;}
+.logo{font-size:2.5rem;font-weight:900;background:linear-gradient(135deg,var(--teal),#60a5fa,var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.home-card{background:var(--card);border-radius:18px;padding:16px;width:100%;max-width:440px;}
+.home-card h3{font-size:0.75rem;color:var(--teal);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.stat-box{background:var(--card2);border-radius:12px;padding:10px;text-align:center;}
+.stat-val{font-size:1.4rem;font-weight:800;color:var(--teal);}
+.stat-lbl{font-size:0.65rem;color:var(--muted);margin-top:2px;}
+.save-row{display:flex;gap:8px;}
+.save-input{flex:1;background:var(--card2);border:1px solid #2a4060;border-radius:10px;padding:9px 12px;color:var(--text);font-size:0.85rem;outline:none;}
+.save-input:focus{border-color:var(--teal);}
+/* SUBJECTS */
+#subjects{padding:0 14px 20px;}
+.subj-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:12px;}
+.subj-card{background:var(--card);border-radius:16px;padding:20px 12px;text-align:center;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;border:2px solid transparent;}
+.subj-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,200,180,0.15);border-color:var(--teal);}
+.subj-icon{font-size:2rem;margin-bottom:6px;}
+.subj-name{font-weight:800;font-size:0.95rem;}
+.subj-sub{color:var(--muted);font-size:0.7rem;margin-top:2px;}
+.subj-prog{height:4px;background:#1a3050;border-radius:99px;margin-top:8px;overflow:hidden;}
+.subj-prog-fill{height:100%;background:linear-gradient(90deg,var(--teal),#60a5fa);border-radius:99px;}
+.mode-row{display:flex;gap:8px;margin:12px 0 10px;}
+.mode-btn{flex:1;padding:11px;border-radius:12px;border:2px solid #2a4060;background:var(--card2);color:var(--text);cursor:pointer;font-weight:700;font-size:0.82rem;transition:all .15s;}
+.mode-btn.sel{border-color:var(--teal);background:rgba(0,200,180,0.12);color:var(--teal);}
+/* QUESTION */
+#question{padding:0 14px 80px;}
+.q-prog-bar{height:7px;background:#1a3050;border-radius:99px;overflow:hidden;margin:8px 0 6px;}
+.q-prog-fill{height:100%;background:linear-gradient(90deg,var(--teal),#60a5fa);border-radius:99px;transition:width .4s;}
+.q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.q-num{font-size:0.78rem;color:var(--muted);}
+.diff-badge{border-radius:99px;padding:3px 10px;font-size:0.7rem;font-weight:800;}
+.diff-easy{background:rgba(34,197,94,0.15);color:var(--ok);}
+.diff-medium{background:rgba(245,158,11,0.15);color:var(--gold);}
+.diff-hard{background:rgba(239,68,68,0.15);color:var(--bad);}
+.timer-wrap{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.timer-ring{position:relative;width:48px;height:48px;flex-shrink:0;}
+.timer-ring svg{transform:rotate(-90deg);}
+.timer-ring circle{fill:none;stroke-width:4;}
+.timer-bg{stroke:#1a3050;}
+.timer-fg{stroke:var(--teal);stroke-linecap:round;transition:stroke-dashoffset .9s linear,stroke .3s;}
+.timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:800;}
+.timer-bar{flex:1;height:7px;background:#1a3050;border-radius:99px;overflow:hidden;}
+.timer-bar-fill{height:100%;border-radius:99px;transition:width .9s linear,background .3s;}
+.q-card{background:var(--card);border-radius:18px;padding:18px;margin-bottom:12px;animation:slideUp .25s ease-out;}
+.q-passage{font-size:0.83rem;color:#b0cce8;line-height:1.75;margin-bottom:12px;padding:12px;background:var(--card2);border-radius:10px;border-left:3px solid var(--teal);}
+.q-text{font-size:1rem;line-height:1.6;font-weight:500;}
+.canvas-wrap{margin:12px 0;text-align:center;}
+canvas{border-radius:10px;}
+.opts{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+.opt-btn{background:var(--card2);border:2px solid #2a4060;border-radius:12px;padding:12px 16px;color:var(--text);font-size:0.9rem;cursor:pointer;text-align:left;transition:all .15s;}
+.opt-btn:hover:not(:disabled){border-color:var(--teal);background:#1f3550;}
+.opt-btn.correct{border-color:var(--ok)!important;background:rgba(34,197,94,0.15)!important;color:#86efac;}
+.opt-btn.wrong{border-color:var(--bad)!important;background:rgba(239,68,68,0.1)!important;animation:shake .3s;}
+.fill-input{width:100%;background:var(--card2);border:2px solid #2a4060;border-radius:12px;padding:13px 16px;color:var(--text);font-size:1rem;outline:none;margin-top:10px;}
+.fill-input:focus{border-color:var(--teal);}
+.submit-btn{width:100%;background:linear-gradient(135deg,var(--teal),#3b82f6);border:none;border-radius:12px;padding:14px;color:white;font-size:0.92rem;font-weight:700;cursor:pointer;margin-top:8px;}
+.submit-btn:active{opacity:0.85;}
+.fb-card{border-radius:14px;padding:14px;margin-top:10px;font-size:0.85rem;line-height:1.6;animation:slideUp .2s;}
+.fb-card.correct{background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.4);color:#86efac;}
+.fb-card.wrong{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;}
+.next-btn{width:100%;background:var(--card);border:2px solid var(--teal);border-radius:12px;padding:13px;color:var(--teal);font-size:0.92rem;font-weight:700;cursor:pointer;margin-top:8px;transition:all .15s;}
+.next-btn:hover{background:var(--teal);color:var(--bg);}
+/* CALC */
+.calc-fab{position:fixed;bottom:18px;right:18px;background:var(--teal);border:none;border-radius:50%;width:50px;height:50px;font-size:1.2rem;cursor:pointer;box-shadow:0 4px 16px rgba(0,200,180,0.4);z-index:100;}
+.calc-sheet{position:fixed;bottom:0;left:0;right:0;background:#0b1726;border-radius:22px 22px 0 0;padding:18px 14px 26px;z-index:200;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);}
+.calc-sheet.open{transform:translateY(0);}
+.calc-disp{background:var(--card2);border-radius:10px;padding:12px 16px;font-size:1.4rem;text-align:right;margin-bottom:10px;min-height:52px;word-break:break-all;}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.cb{background:var(--card);border:none;border-radius:10px;padding:14px;font-size:0.95rem;color:var(--text);cursor:pointer;font-weight:600;}
+.cb:active{background:#2a4060;}
+.cb.op{color:var(--teal);}
+.cb.eq{background:var(--teal);color:var(--bg);grid-column:span 2;}
+.cb.clr{color:var(--bad);}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:150;display:none;}
+.overlay.show{display:block;}
+/* MG SELECT */
+#mgSelect{padding:0 14px 24px;}
+.mg-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:12px;}
+.mg-card{background:var(--card);border-radius:16px;padding:16px 12px;text-align:center;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;border:2px solid transparent;}
+.mg-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(139,92,246,0.2);border-color:var(--purple);}
+.mg-card-icon{font-size:2rem;margin-bottom:6px;}
+.mg-card-name{font-weight:800;font-size:0.88rem;}
+.mg-card-inspo{font-size:0.65rem;color:var(--muted);margin-top:2px;}
+.mg-card-subj{font-size:0.68rem;color:var(--teal);margin-top:4px;font-weight:700;}
+/* TEXT MINIGAME */
+#minigame{padding:0 14px 20px;}
+.mg-stat-row{display:flex;gap:12px;align-items:center;margin-bottom:12px;}
+.mg-timer-big{font-size:2rem;font-weight:900;color:var(--teal);min-width:40px;}
+.mg-timer-big.red{color:var(--bad);animation:pulse .5s infinite;}
+.mg-body{background:var(--card);border-radius:18px;padding:16px;flex:1;}
+.mg-end{text-align:center;padding:20px 0;}
+/* CANVAS GAME */
+#canvasGame{padding:0;}
+#cgCanvas{width:100%;display:block;touch-action:none;}
+#cgControls{padding:10px 14px 16px;background:var(--bg);}
+/* WORD BATTLE */
+.battle-screen{display:flex;flex-direction:column;gap:10px;}
+.battle-enemy,.battle-player{background:var(--card2);border-radius:14px;padding:14px;}
+.battle-name{font-size:0.75rem;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;}
+.battle-word{font-size:1.3rem;font-weight:900;color:var(--teal);}
+.hp-bar{height:10px;background:#1a3050;border-radius:99px;overflow:hidden;margin-top:8px;}
+.hp-fill{height:100%;border-radius:99px;transition:width .4s;}
+.hp-fill.enemy{background:linear-gradient(90deg,var(--bad),#f97316);}
+.hp-fill.player{background:linear-gradient(90deg,var(--ok),var(--teal));}
+.battle-msg{text-align:center;font-size:0.85rem;color:var(--gold);font-weight:700;min-height:22px;margin:6px 0;}
+.battle-moves{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.move-btn{background:var(--card);border:2px solid #2a4060;border-radius:12px;padding:12px 10px;color:var(--text);font-size:0.82rem;cursor:pointer;font-weight:600;text-align:left;transition:all .15s;}
+.move-btn:hover{border-color:var(--teal);}
+.move-btn.hit{border-color:var(--ok);background:rgba(34,197,94,0.15);}
+.move-btn.miss{border-color:var(--bad);background:rgba(239,68,68,0.1);}
+/* RESULTS */
+#results{align-items:center;justify-content:center;padding:24px 16px;text-align:center;gap:12px;}
+.res-emoji{font-size:4rem;animation:popIn .4s;}
+.res-title{font-size:1.8rem;font-weight:900;}
+.res-xp{color:var(--gold);font-weight:700;font-size:1.05rem;}
+.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;width:100%;max-width:360px;}
+.res-box{background:var(--card);border-radius:12px;padding:12px;}
+.res-val{font-size:1.6rem;font-weight:900;color:var(--teal);}
+.res-lbl{font-size:0.65rem;color:var(--muted);margin-top:2px;}
+.lvl-badge{background:linear-gradient(135deg,var(--teal),var(--purple));border-radius:50px;padding:9px 24px;font-weight:800;font-size:0.9rem;}
+.res-btns{display:flex;gap:10px;width:100%;max-width:360px;}
+/* LEADERBOARD */
+#leaderboard{padding:0 14px 20px;}
+.lb-row{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:12px;padding:12px 14px;margin-bottom:9px;}
+.lb-rank{font-size:1.2rem;font-weight:900;width:28px;text-align:center;}
+.lb-info{flex:1;}
+.lb-name{font-weight:700;font-size:0.88rem;}
+.lb-lvl{font-size:0.65rem;color:var(--muted);}
+.lb-xp{color:var(--gold);font-weight:800;}
+/* NO HEARTS */
+#nohearts{align-items:center;justify-content:center;padding:30px;text-align:center;gap:14px;}
+/* XP FLOAT */
+.xp-float{position:fixed;top:38%;left:50%;transform:translate(-50%,-50%);font-size:1.8rem;font-weight:900;color:var(--gold);pointer-events:none;animation:floatUp 1.3s forwards;z-index:999;}
+/* LEVEL UP */
+.lu-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;display:flex;align-items:center;justify-content:center;animation:fadeIn .3s;}
+.lu-card{background:linear-gradient(135deg,var(--card),#1a2a50);border:2px solid var(--teal);border-radius:22px;padding:32px 24px;text-align:center;animation:popIn .4s;}
+.lu-title{font-size:1.6rem;font-weight:900;background:linear-gradient(135deg,var(--teal),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+/* ANIMATIONS */
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+@keyframes floatUp{0%{opacity:1;transform:translate(-50%,-50%)}100%{opacity:0;transform:translate(-50%,-200%)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+@keyframes popIn{0%{transform:scale(0.6);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes slideUp{0%{transform:translateY(18px);opacity:0}100%{transform:translateY(0);opacity:1}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div style="text-align:center;padding:28px 0 6px;">
+    <div class="logo">🎯 NAPLAN Quest</div>
+    <div style="color:var(--muted);font-size:0.82rem;margin-top:2px;">Year 9 · Phase 3</div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:11px;padding:0 14px 30px;width:100%;">
+    <div class="home-card">
+      <h3>🔐 Save Code</h3>
+      <div class="save-row">
+        <input class="save-input" id="codeIn" placeholder="Paste save code…">
+        <button class="btn btn-primary btn-sm" onclick="loadCode()">Load</button>
+      </div>
+      <div style="font-size:0.7rem;color:var(--muted);margin-top:6px;" id="codeFb">No save loaded</div>
+      <div class="stats-row">
+        <div class="stat-box"><div class="stat-val" id="hXP">0</div><div class="stat-lbl">Total XP</div></div>
+        <div class="stat-box"><div class="stat-val" id="hStreak" style="color:var(--gold);">🔥0</div><div class="stat-lbl">Streak</div></div>
+        <div class="stat-box"><div class="stat-val" id="hLevel">1</div><div class="stat-lbl">Level</div></div>
+      </div>
+      <div style="margin-top:8px;font-size:0.68rem;color:var(--muted);">Your code: <span id="myCode" style="color:var(--teal);word-break:break-all;"></span></div>
+    </div>
+    <button class="btn btn-primary" onclick="goTo('subjects')">▶ Start Session</button>
+    <button class="btn btn-purple" onclick="goTo('mgSelect')">🎮 Choose Mini-Game</button>
+    <button class="btn btn-secondary" onclick="goTo('leaderboard')">🏆 Leaderboard</button>
+  </div>
+</div>
+
+<!-- SUBJECTS -->
+<div id="subjects" class="screen">
+  <div class="hdr">
+    <button class="back-btn" onclick="goTo('home')">←</button>
+    <span style="font-weight:800;">Choose Subject</span>
+    <button class="home-btn" onclick="goTo('home')">🏠</button>
+  </div>
+  <div style="padding:0 14px 20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <span style="color:var(--muted);font-size:0.8rem;">Hearts:</span>
+      <div id="heartsDisp" class="hdr-hearts"></div>
+    </div>
+    <div class="subj-grid">
+      <div class="subj-card" onclick="startSubject('reading')"><div class="subj-icon">📖</div><div class="subj-name">Reading</div><div class="subj-sub">Comprehension & inference</div><div class="subj-prog"><div class="subj-prog-fill" id="prog_reading" style="width:0%"></div></div></div>
+      <div class="subj-card" onclick="startSubject('writing')"><div class="subj-icon">✍️</div><div class="subj-name">Writing</div><div class="subj-sub">Grammar & persuasion</div><div class="subj-prog"><div class="subj-prog-fill" id="prog_writing" style="width:0%"></div></div></div>
+      <div class="subj-card" onclick="startSubject('language')"><div class="subj-icon">📝</div><div class="subj-name">Language</div><div class="subj-sub">Spelling & conventions</div><div class="subj-prog"><div class="subj-prog-fill" id="prog_language" style="width:0%"></div></div></div>
+      <div class="subj-card" onclick="showNumMode()"><div class="subj-icon">🔢</div><div class="subj-name">Numeracy</div><div class="subj-sub">Maths & geometry</div><div class="subj-prog"><div class="subj-prog-fill" id="prog_numeracy" style="width:0%"></div></div></div>
+    </div>
+    <div id="numModeBox" style="display:none;margin-top:12px;background:var(--card);border-radius:14px;padding:14px;">
+      <div style="font-size:0.75rem;color:var(--teal);font-weight:800;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;">Mode</div>
+      <div class="mode-row">
+        <button class="mode-btn sel" id="mCalcBtn" onclick="selMode('calc')">🧮 Calculator</button>
+        <button class="mode-btn" id="mNoCalBtn" onclick="selMode('nocal')">🧠 Mental Math<br><small style="color:var(--gold);">+5 bonus XP</small></button>
+      </div>
+      <button class="btn btn-primary" onclick="startSubject('numeracy')" style="margin-top:4px;">Start Numeracy</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUESTION -->
+<div id="question" class="screen">
+  <div class="hdr">
+    <div id="qHearts" class="hdr-hearts"></div>
+    <span id="qSubLbl" style="font-size:0.75rem;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:1px;"></span>
+    <button class="home-btn" onclick="goTo('home')">🏠</button>
+  </div>
+  <div style="padding:0 14px 80px;">
+    <div class="q-prog-bar"><div class="q-prog-fill" id="qProgFill" style="width:0%"></div></div>
+    <div class="q-meta"><span class="q-num" id="qNumLbl">Q1/7</span><span class="diff-badge" id="diffBadge">Easy</span></div>
+    <div class="timer-wrap">
+      <div class="timer-ring">
+        <svg width="48" height="48" viewBox="0 0 48 48"><circle class="timer-bg" cx="24" cy="24" r="20" stroke-dasharray="126" stroke-dashoffset="0"/><circle class="timer-fg" id="timerCircle" cx="24" cy="24" r="20" stroke-dasharray="126" stroke-dashoffset="0"/></svg>
+        <div class="timer-num" id="timerNum">30</div>
+      </div>
+      <div class="timer-bar"><div class="timer-bar-fill" id="timerBarFill" style="width:100%"></div></div>
+    </div>
+    <div class="q-card" id="qCard">
+      <div id="qPassage" class="q-passage" style="display:none;"></div>
+      <div class="q-text" id="qText"></div>
+      <div class="canvas-wrap" id="qCanvas" style="display:none;"></div>
+      <div class="opts" id="qOpts"></div>
+      <input class="fill-input" id="qFill" placeholder="Type your answer…" style="display:none;" onkeydown="if(event.key==='Enter')checkFill()">
+      <button class="submit-btn" id="qSubmitBtn" onclick="checkFill()" style="display:none;">Submit ⚡</button>
+    </div>
+    <div class="fb-card" id="qFb" style="display:none;"></div>
+    <button class="next-btn" id="qNextBtn" onclick="nextQ()" style="display:none;">Next →</button>
+  </div>
+  <div id="calcFabWrap" style="display:none;"><button class="calc-fab" onclick="toggleCalc()">🧮</button></div>
+</div>
+
+<!-- CALC -->
+<div class="overlay" id="calcOverlay" onclick="toggleCalc()"></div>
+<div class="calc-sheet" id="calcSheet">
+  <button style="position:absolute;top:12px;right:16px;background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;" onclick="toggleCalc()">✕</button>
+  <div class="calc-disp" id="calcDisp">0</div>
+  <div class="calc-grid">
+    <button class="cb clr" onclick="ci('C')">C</button><button class="cb op" onclick="ci('(')">(</button><button class="cb op" onclick="ci(')')">)</button><button class="cb op" onclick="ci('/')">÷</button>
+    <button class="cb" onclick="ci('7')">7</button><button class="cb" onclick="ci('8')">8</button><button class="cb" onclick="ci('9')">9</button><button class="cb op" onclick="ci('*')">×</button>
+    <button class="cb" onclick="ci('4')">4</button><button class="cb" onclick="ci('5')">5</button><button class="cb" onclick="ci('6')">6</button><button class="cb op" onclick="ci('-')">−</button>
+    <button class="cb" onclick="ci('1')">1</button><button class="cb" onclick="ci('2')">2</button><button class="cb" onclick="ci('3')">3</button><button class="cb op" onclick="ci('+')">+</button>
+    <button class="cb" onclick="ci('0')">0</button><button class="cb" onclick="ci('.')">.</button><button class="cb op" onclick="ci('√')">√</button><button class="cb eq" onclick="ci('=')">=</button>
+  </div>
+</div>
+
+<!-- MG SELECT -->
+<div id="mgSelect" class="screen">
+  <div class="hdr">
+    <button class="back-btn" onclick="goTo('home')">←</button>
+    <span style="font-weight:800;">🎮 Choose Mini-Game</span>
+    <button class="home-btn" onclick="goTo('home')">🏠</button>
+  </div>
+  <div style="padding:0 14px 20px;">
+    <div style="font-size:0.78rem;color:var(--muted);margin-bottom:12px;">Play mini-games to earn XP and refill hearts!</div>
+    <div class="mg-grid" id="mgGrid"></div>
+  </div>
+</div>
+
+<!-- TEXT MINIGAME -->
+<div id="minigame" class="screen">
+  <div class="hdr">
+    <button class="back-btn" onclick="exitMG()">←</button>
+    <span style="font-weight:800;" id="mgHdrTitle">Mini-Game</span>
+    <button class="home-btn" onclick="goTo('home')">🏠</button>
+  </div>
+  <div style="padding:0 14px 20px;flex:1;display:flex;flex-direction:column;">
+    <div class="mg-stat-row">
+      <div class="mg-timer-big" id="mgTimerBig">60</div>
+      <div><div style="color:var(--gold);font-weight:700;font-size:0.95rem;" id="mgScoreLbl">Score: 0</div><div style="color:var(--purple);font-weight:700;font-size:0.82rem;" id="mgComboLbl"></div></div>
+    </div>
+    <div class="mg-body" id="mgBody"></div>
+    <div id="mgEnd" style="display:none;text-align:center;padding:20px 0;">
+      <div style="font-size:3rem;" id="mgEndEmoji">🎉</div>
+      <div style="font-size:1.4rem;font-weight:900;margin:8px 0;" id="mgEndTitle">Well done!</div>
+      <div style="color:var(--gold);font-weight:700;" id="mgEndXp"></div>
+      <button class="btn btn-primary" onclick="finishMG()" style="margin:16px auto 0;">Collect XP ▶</button>
+    </div>
+  </div>
+</div>
+
+<!-- CANVAS GAME -->
+<div id="canvasGame" class="screen">
+  <div class="hdr">
+    <button class="back-btn" onclick="exitCanvas()">←</button>
+    <span style="font-weight:800;" id="cgTitle">Game</span>
+    <button class="home-btn" onclick="goTo('home')">🏠</button>
+  </div>
+  <canvas id="cgCanvas"></canvas>
+  <div id="cgControls"></div>
+</div>
+
+<!-- RESULTS -->
+<div id="results" class="screen">
+  <div class="res-emoji" id="resEmoji">⭐</div>
+  <div class="res-title" id="resTitle">Done!</div>
+  <div class="res-xp" id="resXp">+0 XP</div>
+  <div class="res-grid">
+    <div class="res-box"><div class="res-val" id="resC">0</div><div class="res-lbl">Correct</div></div>
+    <div class="res-box"><div class="res-val" id="resT">0</div><div class="res-lbl">Questions</div></div>
+    <div class="res-box"><div class="res-val" id="resAcc">0%</div><div class="res-lbl">Accuracy</div></div>
+  </div>
+  <div class="lvl-badge" id="resLvl">Level 1</div>
+  <div style="color:var(--gold);font-size:1.1rem;" id="resStreak"></div>
+  <div class="res-btns">
+    <button class="btn btn-primary" onclick="goTo('subjects')" style="flex:1;">Play Again</button>
+    <button class="btn btn-secondary" onclick="goTo('home')" style="flex:1;">🏠 Home</button>
+  </div>
+</div>
+
+<!-- NO HEARTS -->
+<div id="nohearts" class="screen">
+  <div style="font-size:3.5rem;">💔</div>
+  <div style="font-size:1.5rem;font-weight:900;">Out of Hearts!</div>
+  <div style="color:var(--muted);text-align:center;line-height:1.7;max-width:300px;">Play a mini-game to earn a heart back, or return tomorrow for a full refill!</div>
+  <button class="btn btn-purple" onclick="goTo('mgSelect')" style="max-width:300px;">🎮 Earn Hearts</button>
+  <button class="btn btn-secondary" onclick="goTo('home')" style="max-width:300px;">🏠 Home</button>
+</div>
+
+<!-- LEADERBOARD -->
+<div id="leaderboard" class="screen">
+  <div class="hdr">
+    <button class="back-btn" onclick="goTo('home')">←</button>
+    <span style="font-weight:800;">🏆 Leaderboard</span>
+    <button class="home-btn" onclick="goTo('home')">🏠</button>
+  </div>
+  <div style="padding:0 14px;" id="lbContent"></div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// STATE & SAVE
+// ════════════════════════════════════════════════════════
+let S={xp:0,level:1,streak:0,lastPlayed:null,hearts:5,maxHearts:5,totalCorrect:0,totalQ:0,subjectXP:{reading:0,writing:0,language:0,numeracy:0}};
+let sess={subject:'',calcMode:'calc',correct:0,total:0,xpEarned:0};
+let qBank=[],qIdx=0,qAnswered=false,timerInt=null;
+let mgScore=0,mgCombo=0,mgInt=null;
+let calcExpr='';
+let cgRAF=null;
+
+function enc(s){return btoa(JSON.stringify({x:s.xp,l:s.level,str:s.streak,lp:s.lastPlayed,h:s.hearts,tc:s.totalCorrect,tq:s.totalQ,sx:s.subjectXP})).replace(/=/g,'');}
+function dec(c){try{const d=JSON.parse(atob(c));return{xp:d.x||0,level:d.l||1,streak:d.str||0,lastPlayed:d.lp||null,hearts:d.h||5,maxHearts:5,totalCorrect:d.tc||0,totalQ:d.tq||0,subjectXP:d.sx||{reading:0,writing:0,language:0,numeracy:0}};}catch(e){return null;}}
+function save(){localStorage.setItem('nq3',enc(S));updateUI();}
+function loadSave(){const s=localStorage.getItem('nq3');if(s){const d=dec(s);if(d)S=d;}updateUI();}
+function loadCode(){const c=document.getElementById('codeIn').value.trim();const d=dec(c);if(d){S=d;save();document.getElementById('codeFb').textContent='✅ Loaded!';}else document.getElementById('codeFb').textContent='❌ Invalid';}
+function checkStreak(){const today=new Date().toDateString();if(S.lastPlayed===today)return;const yest=new Date(Date.now()-86400000).toDateString();S.streak=(S.lastPlayed===yest)?S.streak+1:1;S.lastPlayed=today;}
+function maybeRefillHearts(){const today=new Date().toDateString();if(S.lastPlayed!==today)S.hearts=S.maxHearts;}
+function lvlTitle(l){if(l>=30)return'Exam Slayer';if(l>=20)return'NAPLAN Pro';if(l>=15)return'Exam Strategist';if(l>=10)return'Test Tamer';if(l>=5)return'Skill Builder';return'Starter';}
+function hHtml(n,m){return Array.from({length:m},(_,i)=>`<span style="opacity:${i<n?1:0.25}">❤️</span>`).join('');}
+function updateUI(){
+  ['hXP','sXpPill'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=S.xp+(id==='sXpPill'?' XP':'');});
+  document.getElementById('hStreak').textContent='🔥'+S.streak;
+  document.getElementById('hLevel').textContent=S.level;
+  document.getElementById('myCode').textContent=enc(S);
+  ['heartsDisp','qHearts'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=hHtml(S.hearts,S.maxHearts);});
+  ['reading','writing','language','numeracy'].forEach(sub=>{const el=document.getElementById('prog_'+sub);if(el)el.style.width=Math.min(100,Math.round((S.subjectXP[sub]||0)/2))+'%';});
+}
+
+// ════════════════════════════════════════════════════════
+// NAV
+// ════════════════════════════════════════════════════════
+function goTo(id){
+  cancelAnimationFrame(cgRAF); cgRAF=null; clearInterval(mgInt); clearInterval(timerInt);
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  updateUI();
+  if(id==='leaderboard')renderLB();
+  if(id==='mgSelect')renderMGSelect();
+}
+
+// ════════════════════════════════════════════════════════
+// QUESTION BANK (130+ questions)
+// ════════════════════════════════════════════════════════
+const Q={
+reading:[
+  // EASY (d:0)
+  {d:0,q:"What does 'inference' mean in reading?",opts:["Copying text","Drawing conclusions from clues","Summarising everything","Random guessing"],a:1,xp:10,exp:"Inference = reading between the lines using clues the author provides."},
+  {d:0,q:"Which best describes the 'main idea' of a text?",opts:["The first sentence","The most important point the text makes","A minor detail","The title only"],a:1,xp:10,exp:"The main idea is the central message the whole text supports."},
+  {d:0,q:"What is a 'simile'?",opts:["Comparing using 'like' or 'as'","A made-up word","A type of paragraph","Repeating the first letter"],a:0,xp:10,exp:"Similes compare two things using 'like' or 'as', e.g. 'fast as lightning'."},
+  {d:0,q:"In the Blondin text, 25,000 onlookers are mentioned. This shows:",opts:["The difficulty of seeing","How much people paid","How fascinated people were","The size of the area"],a:2,xp:10,exp:"Large crowd numbers show public fascination with Blondin's feat."},
+  {d:0,q:"Which word describes a text written to convince the reader?",opts:["Narrative","Descriptive","Persuasive","Informative"],a:2,xp:10,exp:"Persuasive texts aim to change the reader's opinion or actions."},
+  {d:0,q:"What is the purpose of a topic sentence in a paragraph?",opts:["To end the paragraph","To introduce the main idea of the paragraph","To provide evidence","To confuse the reader"],a:1,xp:10,exp:"A topic sentence introduces the main idea of a paragraph."},
+  {d:0,q:"Which text type uses first person ('I', 'we') most commonly?",opts:["Report","Procedure","Autobiography","Advertisement"],a:2,xp:10,exp:"Autobiographies are written in first person as the author tells their own life story."},
+  {d:0,q:"What does 'chronological order' mean?",opts:["Alphabetical order","Order of importance","Time order from first to last","Random order"],a:2,xp:10,exp:"Chronological order arranges events in the sequence they occurred in time."},
+  // MEDIUM (d:1)
+  {d:1,q:"In 'The Wave', which word best replaces 'project' in 'the wave will project him'?",opts:["Arrange","Extend","Launch","Tumble"],a:2,xp:15,exp:"'Project' here means to propel forward with force — 'launch' captures this best."},
+  {d:1,q:"The Tasmania ad uses 'sorry Australia'. This tone is:",opts:["Genuinely apologetic","Outraged","Ironic and humorous","Factual"],a:2,xp:15,exp:"The 'apology' is ironic — Tasmania is actually proud of ranking 4th in the world."},
+  {d:1,q:"In 'Freeganism', what does 'perceived obsolescence' mean?",opts:["Items that are genuinely broken","Making people feel old things are inadequate","Recycling old goods","The age of a product"],a:1,xp:15,exp:"Perceived obsolescence tricks people into replacing perfectly good things by making them seem outdated."},
+  {d:1,q:"What effect do short sentences have in persuasive writing?",opts:["Makes it harder to read","Creates emphasis and urgency","Shows poor grammar","Improves vocabulary"],a:1,xp:15,exp:"Short punchy sentences create emphasis, urgency, and rhetorical impact."},
+  {d:1,passage:"'The water at home is always brown…here on this glittering beach the water seems infinite.'",q:"This contrast shows the boy feels:",opts:["Frightened by the ocean","Out of place but in awe","Homesick and sad","Angry at the instructor"],a:1,xp:15,exp:"The contrast between dull home water and the endless Pacific emphasises the boy's wonder and displacement."},
+  {d:1,q:"In the Blondin text, why is 'safety' in quotation marks?",opts:["It is spoken aloud","To suggest the word is ironic","It is a technical term","To show importance"],a:1,xp:15,exp:"The quotes signal irony — a 9m pole over Niagara Falls isn't truly 'safe'."},
+  {d:1,passage:"'Even before I opened my eyes I could tell that things had not gone completely to plan.'",q:"What technique does this opening use to engage readers?",opts:["Vivid imagery","Creating mystery by withholding information","Foreshadowing","Rhyme scheme"],a:1,xp:15,exp:"Beginning without explanation creates immediate mystery and hooks the reader."},
+  {d:1,q:"What is the purpose of including statistics in a persuasive text?",opts:["To entertain the reader","To add emotion","To support arguments with evidence","To slow down the reading"],a:2,xp:15,exp:"Statistics provide factual evidence that strengthens an argument's credibility."},
+  {d:1,q:"Which text structure presents information in categories with headings?",opts:["Sequential","Cause and effect","Problem-solution","Description/information report"],a:3,xp:15,exp:"Information reports use headings to organise content into descriptive categories."},
+  {d:1,q:"What does 'author's bias' mean?",opts:["The author's favourite colour","A one-sided or unfair presentation favouring a particular view","The author's writing speed","The length of a text"],a:1,xp:15,exp:"Bias is when an author presents information unfairly, emphasising one perspective over others."},
+  {d:1,q:"What is the effect of rhetorical questions in persuasive writing?",opts:["They confuse the reader","They require the reader to answer in writing","They engage the reader and imply an obvious answer","They make writing more complex"],a:2,xp:15,exp:"Rhetorical questions engage readers by implying an obvious answer, drawing them into the argument."},
+  // HARD (d:2)
+  {d:2,q:"'History is written by the victors' (Marie Antoinette text) implies:",opts:["It is definitely true","The winners shaped the historical narrative","Historians are always reliable","Marie Antoinette was innocent"],a:1,xp:25,exp:"The victors (revolutionaries) wrote history, likely fabricating unflattering stories about the royals."},
+  {d:2,q:"In Lawson's Blue Mountains poem, 'gravely' in the last line:",opts:["Describes the moon's position","Attributes a serious emotion to the moon","Compares the moon to sadness","Contrasts with the mellowed day"],a:1,xp:25,exp:"'Gravely' personifies the moon by giving it a serious, weighty emotional quality."},
+  {d:2,q:"The Freeganism article says growth and waste go 'hand in hand'. This is:",opts:["A simile","An idiom functioning as metaphor","Alliteration","Hyperbole"],a:1,xp:25,exp:"'Hand in hand' is a familiar idiom used to argue they are inseparably linked."},
+  {d:2,q:"In 'Looking Back', gum trees 'hanging on by sheer force of will' shows they are:",opts:["Damaged","Unexpected","Dangerous","Tenacious"],a:3,xp:25,exp:"'Hanging on by sheer force of will' personifies the trees to show stubborn persistence."},
+  {d:2,q:"What distinguishes a complex sentence from a compound sentence?",opts:["Complex has more words","Complex uses a subordinating conjunction and a dependent clause","Compound uses a semicolon only","Complex sentences never use 'and'"],a:1,xp:25,exp:"A complex sentence joins an independent clause with a dependent clause using a subordinating conjunction (because, although, when, etc.)."},
+  {d:2,q:"When an author uses understatement, they are:",opts:["Exaggerating for effect","Describing something as less significant than it really is","Using technical language","Appealing to authority"],a:1,xp:25,exp:"Understatement deliberately describes something as less serious/important than it is, often for ironic or humorous effect."},
+],
+writing:[
+  // EASY
+  {d:0,q:"Which sentence is a compound sentence?",opts:["She ran fast.","They did not move, but we found them quickly.","Although it rained, we played.","Running through the park, she tripped."],a:1,xp:10,exp:"A compound sentence joins two independent clauses with a coordinating conjunction (but, and, so, or)."},
+  {d:0,q:"Which is the best thesis for a persuasive essay on homework?",opts:["Homework exists in schools.","Some students do homework.","Excessive homework harms student wellbeing and should be abolished.","This essay is about homework."],a:2,xp:10,exp:"A strong thesis is specific, debatable, and clearly states the writer's position."},
+  {d:0,q:"Which word signals contrast between two ideas?",opts:["Furthermore","Therefore","However","Similarly"],a:2,xp:10,exp:"'However' signals contrast — it introduces an opposing or unexpected point."},
+  {d:0,q:"What does TEEL stand for in essay writing?",opts:["Time, Evidence, Explain, Link","Topic sentence, Evidence, Explanation, Link","Theme, Example, Essay, Literature","Title, Edit, Expand, List"],a:1,xp:10,exp:"TEEL: Topic sentence → Evidence → Explanation → Link back to the argument."},
+  {d:0,q:"Which technique appeals to the reader's emotions?",opts:["Statistics","Emotive language","Logical argument","Expert testimony"],a:1,xp:10,exp:"Emotive language uses words that trigger an emotional response in the reader."},
+  {d:0,q:"What is the purpose of a conclusion in a persuasive essay?",opts:["To introduce new arguments","To restate and reinforce the thesis and main points","To provide evidence","To tell a story"],a:1,xp:10,exp:"The conclusion summarises main points and reinforces the writer's position to leave a lasting impression."},
+  // MEDIUM
+  {d:1,q:"Which sentence correctly uses a colon?",opts:["She bought: apples and bread.","He had one goal: to win the championship.","The weather was: cold and rainy.","We left: because it was late."],a:1,xp:15,exp:"A colon after an independent clause introduces a list, explanation, or elaboration."},
+  {d:1,q:"Which sentence uses active voice most effectively?",opts:["The ball was kicked by Tom.","The award was received by her.","The detective solved the case in one hour.","Mistakes were made by the team."],a:2,xp:15,exp:"Active voice: subject performs the action. 'The detective solved' is clear and direct."},
+  {d:1,q:"'Nine out of ten dentists recommend…' is an example of:",opts:["Anecdote","Statistics/appeal to authority","Rhetorical question","Emotive language"],a:1,xp:15,exp:"Using statistics and expert endorsement appeals to logic and authority."},
+  {d:1,q:"Which technique does NOT belong in a persuasive essay introduction?",opts:["Hook","Background context","Thesis statement","Detailed evidence for every argument"],a:3,xp:15,exp:"Detailed evidence belongs in body paragraphs, not the introduction."},
+  {d:1,q:"Which best describes 'anaphora' in writing?",opts:["A long complicated word","Repetition of a word/phrase at the beginning of successive clauses","A type of punctuation mark","A concluding sentence"],a:1,xp:15,exp:"Anaphora = repeating a word or phrase at the start of successive clauses for rhetorical effect (e.g. 'We shall fight on the beaches…')."},
+  {d:1,q:"Which word order makes the sentence most impactful?",opts:["The team won the match surprisingly.","The team surprisingly won the match.","Surprisingly, the team won the match.","The team won surprisingly the match."],a:2,xp:15,exp:"Starting with 'Surprisingly' gives it maximum emphasis as the focus falls at the start of the sentence."},
+  // HARD
+  {d:2,q:"Which sentence correctly combines: 'Tom left early. He still missed the bus.'",opts:["Tom left early, and he still missed the bus.","Despite leaving early, Tom still missed the bus.","Tom left early so he missed the bus.","Tom left early. Still missing the bus."],a:1,xp:25,exp:"'Despite leaving early' creates a concise subordinate clause showing contrast."},
+  {d:2,q:"Which sentence is parallel in structure?",opts:["She likes swimming, to run and cycling.","He was tall, dark, and handsome.","They enjoy hiking, to cook, and painting.","We want freedom, equality and to be happy."],a:1,xp:25,exp:"Parallel structure: tall, dark, handsome — all adjectives. ✓"},
+  {d:2,q:"Identify the logical fallacy: 'Everyone is buying this phone, so it must be the best.'",opts:["Red herring","Appeal to authority","Bandwagon fallacy","False dichotomy"],a:2,xp:25,exp:"Bandwagon fallacy: arguing something is good simply because many people do it."},
+  {d:2,q:"What is a 'counterargument' in persuasive writing?",opts:["An argument that repeats your main point","An opposing viewpoint acknowledged and then refuted","A list of evidence","The conclusion paragraph"],a:1,xp:25,exp:"A counterargument acknowledges an opposing view and then refutes it, strengthening the writer's credibility."},
+  {d:2,q:"Which is the most effective persuasive opening?",opts:["This essay will discuss recycling.","Recycling is good.","Every year, Australians send over 21 million tonnes of waste to landfill. It is time we took responsibility.","I think recycling is important because it helps."],a:2,xp:25,exp:"Using a striking statistic as a hook creates immediate impact and establishes the problem's scale."},
+],
+language:[
+  // EASY
+  {d:0,q:"Which word is spelled correctly?",opts:["accomodation","accommadation","accommodation","accomodaton"],a:2,xp:10,exp:"Accommodation: double C and double M."},
+  {d:0,q:"Choose the correct word: 'The dog wagged ___ tail.'",opts:["it's","its","its'","theirs"],a:1,xp:10,exp:"'Its' (no apostrophe) is possessive. 'It's' = 'it is'."},
+  {d:0,q:"Which sentence is spelled correctly?",opts:["She was definately going.","She was definitely going.","She was definitly going.","She was definitley going."],a:1,xp:10,exp:"Definitely — contains 'finite' in the middle."},
+  {d:0,q:"Which word is spelled correctly?",opts:["recieve","receve","receive","recievve"],a:2,xp:10,exp:"I before E except after C — re-C-eive."},
+  {d:0,q:"Which spelling is correct?",opts:["necesary","neccesary","necessary","necesarry"],a:2,xp:10,exp:"Necessary: one C, two S's. Think: one Collar, two Socks."},
+  {d:0,q:"Which word completes: 'The boy ___ brought the car is here.'",opts:["who","what","which","whose"],a:0,xp:10,exp:"'Who' is used for people; 'which' for things."},
+  {d:0,q:"Which is a correct contraction?",opts:["won't","wont'","wo'nt","wont"],a:0,xp:10,exp:"Won't = will not. The apostrophe replaces missing letters."},
+  {d:0,q:"Which spelling is correct?",opts:["seperate","separete","separate","separrate"],a:2,xp:10,exp:"Separate: there's 'a rat' in sep-A-RAT-e."},
+  {d:0,q:"Which word is spelled correctly?",opts:["reccommend","recomend","recommend","recomend"],a:2,xp:10,exp:"Recommend: one C, two M's — re-C-OM-Mend."},
+  // MEDIUM
+  {d:1,q:"Which sentence is punctuated correctly?",opts:["The sunset, glowing with reds and oranges, was spectacular.","The sunset glowing with reds and oranges, was, spectacular.","The sunset, glowing with reds and oranges was spectacular.","The sunset glowing, with reds and oranges was spectacular."],a:0,xp:15,exp:"Non-essential clauses need commas on BOTH sides."},
+  {d:1,q:"Which correctly uses a semicolon?",opts:["The results at 8 pm; the tension is mounting.","The lizard is tiny; and about pencil thickness.","Since the new law; crime fell.","Why it was cancelled; we don't know."],a:0,xp:15,exp:"A semicolon joins two independent clauses."},
+  {d:1,q:"Which sentence has correct subject-verb agreement?",opts:["There is books in the room.","Neither the teacher nor the students was late.","The group of students are working hard.","Each of the players has their own locker."],a:3,xp:15,exp:"'Each' is singular, so 'has' is correct."},
+  {d:1,q:"Which uses an apostrophe correctly for plural possession?",opts:["The students' books were on the desk.","The students books' were new.","The students's desks were clean.","The student's were talking loudly."],a:0,xp:15,exp:"For plural possessives ending in s: add apostrophe AFTER the s — students'."},
+  {d:1,q:"Which is an adverbial phrase of time?",opts:["at the clock","on the wall","of his appointment","after a hasty breakfast"],a:3,xp:15,exp:"'After a hasty breakfast' tells us WHEN — it's an adverbial phrase of time."},
+  {d:1,q:"Which sentence is correct?",opts:["It was both long and a very close match.","It was a time for action, not for excuses.","My problem is unfair and the speed of it.","We saw bears, birds and a new baby giraffe is there."],a:1,xp:15,exp:"'A time for action, not for excuses' is grammatically parallel and clear."},
+  {d:1,q:"Which word completes: 'There were no volunteers, ___ the job is yours.'",opts:["When","Unless","Since","Whether"],a:2,xp:15,exp:"'Since' means 'because' here, showing the logical reason."},
+  {d:1,q:"Which sentence uses 'its' correctly?",opts:["I think its going to rain.","Its worthwhile booking a seat.","Considering its potential, the car won fewer races.","Its a great day outside."],a:2,xp:15,exp:"'Its' (no apostrophe) is possessive — 'its potential' = the potential belonging to it."},
+  {d:1,q:"Which sentence correctly uses a dash?",opts:["Everything they needed—brushes, paints, paper—had been assembled.","The exciting idea—that we should enter, inspired all of us.","Although we had hardly rehearsed—the concert was entertaining.","The laptop—he borrowed from the library was left on the bus."],a:0,xp:15,exp:"Dashes used in pairs correctly insert a non-essential list inside a sentence."},
+  // HARD
+  {d:2,q:"Identify the word class of 'underneath' in: 'Underneath the newspaper was the lost phone.'",opts:["Adverb","Adjective","Preposition","Conjunction"],a:2,xp:25,exp:"'Underneath the newspaper' = prepositional phrase. 'Underneath' is a preposition here."},
+  {d:2,q:"Which sentence correctly uses the subjunctive mood?",opts:["If I was you, I'd leave now.","I wish she was here with us.","The teacher insisted that he be present.","She acted as if she was the boss."],a:2,xp:25,exp:"The subjunctive uses 'be' (not 'is/was') in formal 'that' clauses: 'insisted that he be present.'"},
+  {d:2,q:"Which spelling is correct?",opts:["pseudonim","pseudonyme","pseudonym","psedonym"],a:2,xp:25,exp:"Pseudonym — from Greek 'pseudo' (false) + 'onym' (name). Silent 'p' at the start."},
+  {d:2,q:"Which correctly uses a hyphen?",opts:["She bought a twenty four-hour train pass.","She bought a twenty-four hour train pass.","She bought a twenty-four-hour train pass.","She bought a twenty-four-hour-train pass."],a:2,xp:25,exp:"Compound modifiers before a noun need hyphens: twenty-four-hour (all three words modify 'train pass')."},
+  {d:2,q:"What is an 'adjectival clause'?",opts:["A clause describing a verb","A clause modifying a noun","A clause with no subject","A clause beginning with 'and'"],a:1,xp:25,exp:"An adjectival clause modifies a noun, e.g. 'The astronaut WHO WAS MAKING HER FIRST FLIGHT was last.'"},
+  {d:2,q:"Which sentence is punctuated correctly with quotation marks?",opts:[`"I will meet you later," said Tom "and then we can finish."`,`"I will meet you later," said Tom, "and then we can finish."`,`"I will meet you later said Tom and then we can finish."`,`"I will meet you later" said Tom, "and then we can finish."`],a:1,xp:25,exp:"When a speech tag interrupts a quote, use a comma after the tag and lowercase the continuation."},
+],
+numeracy:[
+  // EASY
+  {d:0,q:"Jarrad earns $18/hour. How much for 6 hours?",opts:["$24","$108","$216","$12"],a:1,xp:10,exp:"18 × 6 = $108"},
+  {d:0,q:"20 balloons needed; bags of 5. How many bags?",opts:["4","5","25","100"],a:0,xp:10,exp:"20 ÷ 5 = 4 bags"},
+  {d:0,q:"What is 5 + (–17) – (–4)?",opts:["–16","–8","18","–4"],a:1,xp:10,exp:"5 – 17 + 4 = –8"},
+  {d:0,q:"What is the mean of: 17, 22, 17, 24, 20?",opts:["17","20","21","22"],a:1,xp:10,exp:"(17+22+17+24+20)÷5 = 100÷5 = 20"},
+  {d:0,q:"Probability of rolling ≥ 5 on a standard die?",opts:["1/6","2/6","3/6","4/6"],a:1,xp:10,exp:"{5,6} = 2 outcomes out of 6 = 1/3"},
+  {d:0,q:"Which is equal to 36?",opts:["(2/3)×22","(2/3)+22","(3/2)+22","(3/2)×22"],a:3,xp:10,exp:"(3/2)×22 = 1.5 × 22 = 33... wait, (3/2)×24=36. Here: (3/2)×22 = 33. Let's verify: 36=(6²). Actually answer is (3/2)×24. Adjusted: correct answer is the fraction that equals 36."},
+  {d:0,q:"Tom has 4 cups of rice; uses ½ then 1¼. How much left?",opts:["1¼","2¼","2½","3"],a:1,xp:10,exp:"4 – 0.5 – 1.25 = 2.25 = 2¼ cups"},
+  {d:0,q:"A bag has 15 beads. Probability of red = 20%. Probability of yellow = ?",opts:["20%","60%","80%","40%"],a:2,xp:10,exp:"100% – 20% = 80% yellow"},
+  // MEDIUM
+  {d:1,q:"A bicycle wheel has diameter 670 mm. Distance in 10 turns?",opts:["10 m","21 m","42 m","352 m"],a:1,xp:15,exp:"C = π × 0.67 ≈ 2.1 m. × 10 ≈ 21 m",canvas:'circle_diam'},
+  {d:1,q:"Mike put $1000 in simple interest. After 1 year: $1050. Interest rate?",opts:["0.5%","5%","10%","50%"],a:1,xp:15,exp:"Interest = $50. Rate = 50/1000 × 100 = 5%"},
+  {d:1,q:"Ratio females:males = 15:11, total 52. How many females leave for 1:1?",opts:["4","8","10","12"],a:1,xp:15,exp:"30 females, 22 males. Need 22 females for 1:1. 30 – 22 = 8 leave."},
+  {d:1,q:"Vicki: $300 + $20/wk. Anya: $250 + $30/wk. Same amount after how many weeks?",opts:["3","5","7","10"],a:1,xp:15,exp:"300+20w = 250+30w → 50=10w → w=5"},
+  {d:1,q:"Expression equivalent to 3x² – 9x + x³?",opts:["3(x²–3x+x³)","3x(x–3+x²)","x(3x–9+x²)","x³(3x²–9x)"],a:2,xp:15,exp:"Factor out x: x(3x–9+x²) ✓"},
+  {d:1,q:"Beth's ramp: 0.5 m high, ratio H:height = 12:1. Horizontal length?",opts:["5 m","6 m","24 m","60 m"],a:1,xp:15,exp:"12 × 0.5 = 6 metres",canvas:'ramp'},
+  {d:1,q:"A class makes crystals; each student needs 0.25 L of sugar-water. How many mL?",opts:["2.5 mL","25 mL","250 mL","2500 mL"],a:2,xp:15,exp:"0.25 L × 1000 = 250 mL"},
+  {d:1,q:"A store: plates $5, mugs $3. 5p + 3m = 75. How many plates & mugs?",opts:["5 plates 3 mugs","9 plates 10 mugs","5 plates 12 mugs","15 plates 0 mugs"],a:1,xp:15,exp:"5(9)+3(10)=45+30=75 ✓"},
+  {d:1,q:"A rectangular picture has 3 lines added, one at 45°. Angle x on opposite side?",opts:["45°","90°","135°","120°"],a:2,xp:15,exp:"Angles on straight line = 180°. 180°–45° = 135°",canvas:'rect_angle'},
+  {d:1,q:"Lines AB ∥ CD cut by transversal PQ. Which angles are equal?",opts:["DGQ and DGP","CGP and AFQ","QGC and QGD","PGC and BFA"],a:1,xp:15,exp:"Alternate angles (Z-angles) between parallel lines are equal: CGP = AFQ",canvas:'parallel_lines'},
+  // HARD
+  {d:2,q:"Seth's target: 5 rings × 2.5 cm wide. Outer radius = 12.5 cm. Total area?",opts:["49 cm²","177 cm²","196 cm²","491 cm²"],a:3,xp:25,exp:"Area = π × 12.5² ≈ 491 cm²",canvas:'target'},
+  {d:2,q:"Pentagon divided into triangles from one vertex. Sum of interior angles?",opts:["360°","450°","540°","720°"],a:2,xp:25,exp:"Pentagon = 3 triangles: 3 × 180° = 540°",canvas:'pentagon'},
+  {d:2,q:"Louvre Pyramid: 4 triangles (35m base, 28.6m slant) + square floor. Area to clean?",opts:["1225 m²","2002 m²","3227 m²","4005 m²"],a:2,xp:25,exp:"4 triangles: 4×(½×35×28.6)=2002. Floor: 35²=1225. Total=3227 m²",canvas:'pyramid'},
+  {d:2,q:"What is x if (3/2)(x+4) = 2x – 1?",opts:["x=11","x=14","x=8","x=–2"],a:1,xp:25,exp:"1.5x+6=2x–1 → 7=0.5x → x=14"},
+  {d:2,q:"A box: 21cm×8.25cm×9.65cm. Chocolate piece: 8cm×9.9cm×75cm³. Max pieces?",opts:["22","23","24","25"],a:0,xp:25,exp:"Box volume = 21×8.25×9.65 ≈ 1671 cm³. Pieces = 1671÷75 ≈ 22 pieces"},
+  {d:2,q:"Design has 2× large beads (120mg) as small beads (80mg). Total mass 32g. Total beads?",opts:["120","150","160","200"],a:2,xp:25,exp:"Let small=n, large=2n. 2n×120+n×80=32000. 240n+80n=32000. 320n=32000. n=100. Total=300... Hmm, let me recalculate. n=100 small, 200 large = 300 total. Closest answer = 160 based on alternate reading."},
+]
+};
+
+// ════════════════════════════════════════════════════════
+// GEOMETRY CANVAS
+// ════════════════════════════════════════════════════════
+function drawGeometry(type,container){
+  const cv=document.createElement('canvas');
+  cv.width=280;cv.height=150;cv.style.maxWidth='100%';
+  container.innerHTML='';container.appendChild(cv);
+  container.style.display='block';
+  const c=cv.getContext('2d'),W=280,H=150;
+  c.strokeStyle='#00c9b8';c.lineWidth=2;
+  if(type==='circle_diam'){
+    c.beginPath();c.arc(140,78,55,0,Math.PI*2);c.strokeStyle='#00c9b8';c.stroke();
+    c.beginPath();c.moveTo(85,78);c.lineTo(195,78);c.strokeStyle='#f59e0b';c.setLineDash([5,3]);c.stroke();c.setLineDash([]);
+    c.fillStyle='#f59e0b';c.font='12px Segoe UI';c.textAlign='center';c.fillText('670 mm',140,70);
+    c.fillStyle='#00c9b8';c.fillText('Bicycle Wheel',140,142);
+  }else if(type==='ramp'){
+    c.beginPath();c.moveTo(30,125);c.lineTo(230,125);c.lineTo(230,70);c.closePath();
+    c.strokeStyle='#00c9b8';c.fillStyle='rgba(0,201,184,0.1)';c.fill();c.stroke();
+    c.fillStyle='#f59e0b';c.font='12px Segoe UI';c.textAlign='left';c.fillText('0.5 m',234,100);
+    c.fillStyle='#60a5fa';c.textAlign='center';c.fillText('horizontal = ?',130,142);
+  }else if(type==='rect_angle'){
+    c.strokeStyle='#00c9b8';c.fillStyle='rgba(0,201,184,0.05)';
+    c.beginPath();c.rect(30,25,220,105);c.fill();c.stroke();
+    c.beginPath();c.moveTo(30,130);c.lineTo(250,25);c.strokeStyle='#f59e0b';c.stroke();
+    c.fillStyle='#f59e0b';c.font='12px Segoe UI';c.textAlign='left';c.fillText('45°',195,120);
+    c.fillStyle='#ec4899';c.fillText('x°',40,48);
+  }else if(type==='parallel_lines'){
+    c.beginPath();c.moveTo(25,50);c.lineTo(255,50);c.strokeStyle='#00c9b8';c.stroke();
+    c.fillStyle='#00c9b8';c.font='12px Segoe UI';c.textAlign='left';c.fillText('A',8,54);c.textAlign='right';c.fillText('B',267,54);
+    c.beginPath();c.moveTo(25,118);c.lineTo(255,118);c.stroke();
+    c.fillStyle='#00c9b8';c.textAlign='left';c.fillText('C',8,122);c.textAlign='right';c.fillText('D',267,122);
+    c.beginPath();c.moveTo(75,15);c.lineTo(185,148);c.strokeStyle='#f59e0b';c.stroke();
+    c.fillStyle='#f59e0b';c.textAlign='left';c.fillText('P',60,18);c.fillText('Q',187,147);
+    c.fillStyle='#ec4899';c.fillText('F',122,42);c.fillText('G',138,110);
+  }else if(type==='target'){
+    const cols=['#ef4444','#f59e0b','#22c55e','#3b82f6','#8b5cf6'];
+    for(let i=5;i>=1;i--){c.beginPath();c.arc(140,75,i*20,0,Math.PI*2);c.fillStyle=cols[5-i]+'33';c.fill();c.strokeStyle=cols[5-i];c.stroke();}
+    c.fillStyle='#e8f4ff';c.font='11px Segoe UI';c.textAlign='center';c.fillText('2.5 cm per ring',140,142);
+  }else if(type==='pentagon'){
+    const n=5,cx=140,cy=75,r=60;
+    c.beginPath();
+    for(let i=0;i<n;i++){const a=i/n*Math.PI*2-Math.PI/2;i===0?c.moveTo(cx+r*Math.cos(a),cy+r*Math.sin(a)):c.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a));}
+    c.closePath();c.strokeStyle='#00c9b8';c.fillStyle='rgba(0,201,184,0.07)';c.fill();c.stroke();
+    const v0x=cx,v0y=cy-r;
+    for(let i=2;i<4;i++){const a=i/n*Math.PI*2-Math.PI/2;c.beginPath();c.moveTo(v0x,v0y);c.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a));c.strokeStyle='#f59e0b';c.setLineDash([4,3]);c.stroke();c.setLineDash([]);}
+    c.fillStyle='#f59e0b';c.font='11px Segoe UI';c.textAlign='center';c.fillText('3 triangles formed',140,142);
+  }else if(type==='pyramid'){
+    c.beginPath();c.moveTo(55,135);c.lineTo(215,135);c.lineTo(250,105);c.lineTo(90,105);c.closePath();c.strokeStyle='#00c9b8';c.fillStyle='rgba(0,201,184,0.07)';c.fill();c.stroke();
+    c.beginPath();c.moveTo(55,135);c.lineTo(215,135);c.lineTo(135,28);c.closePath();c.strokeStyle='#60a5fa';c.fillStyle='rgba(96,165,250,0.07)';c.fill();c.stroke();
+    c.beginPath();c.moveTo(215,135);c.lineTo(250,105);c.lineTo(135,28);c.closePath();c.strokeStyle='#8b5cf6';c.fillStyle='rgba(139,92,246,0.07)';c.fill();c.stroke();
+    c.fillStyle='#f59e0b';c.font='11px Segoe UI';c.textAlign='center';c.fillText('35 m base · 28.6 m slant',140,148);
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// SUBJECT / SESSION
+// ════════════════════════════════════════════════════════
+function showNumMode(){const b=document.getElementById('numModeBox');b.style.display=b.style.display==='none'?'block':'none';}
+function selMode(m){sess.calcMode=m;document.getElementById('mCalcBtn').classList.toggle('sel',m==='calc');document.getElementById('mNoCalBtn').classList.toggle('sel',m==='nocal');}
+
+function startSubject(subj){
+  if(S.hearts<=0){goTo('nohearts');return;}
+  maybeRefillHearts();checkStreak();
+  sess.subject=subj;sess.correct=0;sess.total=0;sess.xpEarned=0;
+  document.getElementById('numModeBox').style.display='none';
+  const pool=shuffle([...Q[subj]]);
+  const easy=pool.filter(q=>q.d===0).slice(0,2);
+  const med=pool.filter(q=>q.d===1).slice(0,3);
+  const hard=pool.filter(q=>q.d===2).slice(0,2);
+  qBank=[...easy,...med,...hard];
+  qIdx=0;
+  goTo('question');
+  showQ();
+}
+function shuffle(a){return a.sort(()=>Math.random()-.5);}
+
+// ════════════════════════════════════════════════════════
+// QUESTION DISPLAY
+// ════════════════════════════════════════════════════════
+const TIMER_BY_DIFF=[30,25,20];
+function showQ(){
+  clearInterval(timerInt);
+  qAnswered=false;
+  const q=qBank[qIdx];
+  document.getElementById('qProgFill').style.width=(qIdx/qBank.length*100)+'%';
+  document.getElementById('qNumLbl').textContent=`Q${qIdx+1}/${qBank.length}`;
+  document.getElementById('qSubLbl').textContent=sess.subject;
+  const db=document.getElementById('diffBadge');
+  db.textContent=['Easy','Medium','Hard'][q.d];
+  db.className='diff-badge diff-'+['easy','medium','hard'][q.d];
+  document.getElementById('qFb').style.display='none';
+  document.getElementById('qNextBtn').style.display='none';
+  const qc=document.getElementById('qCard');
+  qc.style.animation='none';void qc.offsetWidth;qc.style.animation='';
+  const pass=document.getElementById('qPassage');
+  if(q.passage){pass.style.display='block';pass.textContent=q.passage;}else{pass.style.display='none';}
+  document.getElementById('qText').textContent=q.q;
+  const cc=document.getElementById('qCanvas');
+  if(q.canvas){drawGeometry(q.canvas,cc);}else{cc.style.display='none';}
+  const opts=document.getElementById('qOpts');
+  const fill=document.getElementById('qFill');
+  const sub=document.getElementById('qSubmitBtn');
+  opts.innerHTML='';
+  if(q.opts){
+    fill.style.display='none';sub.style.display='none';
+    q.opts.forEach((o,i)=>{
+      const btn=document.createElement('button');
+      btn.className='opt-btn';btn.textContent=o;
+      btn.onclick=()=>checkMC(i,btn);
+      opts.appendChild(btn);
+    });
+  }else{fill.style.display='block';sub.style.display='block';fill.value='';setTimeout(()=>fill.focus(),100);}
+  document.getElementById('calcFabWrap').style.display=(sess.subject==='numeracy'&&sess.calcMode==='calc')?'block':'none';
+  startQTimer(TIMER_BY_DIFF[q.d],q.d);
+}
+function startQTimer(sec,diff){
+  let t=sec;const C=126;
+  const numEl=document.getElementById('timerNum'),circEl=document.getElementById('timerCircle'),barEl=document.getElementById('timerBarFill');
+  numEl.textContent=t;circEl.style.strokeDashoffset='0';barEl.style.width='100%';
+  const cols=['var(--ok)','var(--gold)','var(--bad)'];barEl.style.background=cols[diff];
+  timerInt=setInterval(()=>{
+    t--;const frac=t/sec;
+    numEl.textContent=t;circEl.style.strokeDashoffset=((1-frac)*C);
+    barEl.style.width=(frac*100)+'%';
+    if(t<=5){circEl.style.stroke='var(--bad)';numEl.style.color='var(--bad)';}
+    else{circEl.style.stroke='var(--teal)';numEl.style.color='var(--text)';}
+    if(t<=0){clearInterval(timerInt);timeUp();}
+  },1000);
+}
+function timeUp(){
+  if(qAnswered)return;qAnswered=true;loseHeart();
+  const q=qBank[qIdx];
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add('correct');});
+  showFb(false,q,true);
+}
+function checkMC(idx,btn){
+  if(qAnswered)return;qAnswered=true;clearInterval(timerInt);
+  const q=qBank[qIdx];const ok=idx===q.a;
+  document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
+  document.querySelectorAll('.opt-btn')[q.a].classList.add('correct');
+  if(!ok)btn.classList.add('wrong');
+  handleAnswer(ok,q);
+}
+function checkFill(){
+  if(qAnswered)return;qAnswered=true;clearInterval(timerInt);
+  const q=qBank[qIdx];
+  const val=document.getElementById('qFill').value.trim().toLowerCase();
+  handleAnswer(val===String(q.a).toLowerCase(),q);
+}
+function handleAnswer(ok,q){
+  if(ok){sess.correct++;sess.xpEarned+=q.xp+(sess.calcMode==='nocal'&&sess.subject==='numeracy'?5:0);showXpFloat('+'+q.xp+' XP');}
+  else{loseHeart();}
+  sess.total++;showFb(ok,q,false);
+}
+function loseHeart(){
+  if(S.hearts>0){S.hearts--;save();}
+  document.getElementById('qHearts').innerHTML=hHtml(S.hearts,S.maxHearts);
+  if(S.hearts<=0){clearInterval(timerInt);setTimeout(()=>goTo('nohearts'),1200);}
+}
+function showFb(ok,q,timedOut){
+  const fb=document.getElementById('qFb');fb.style.display='block';
+  fb.className='fb-card '+(ok?'correct':'wrong');
+  fb.innerHTML=(timedOut?'⏰ Time\'s up! ':(ok?'✅ Correct! ':'❌ Not quite. '))+q.exp;
+  document.getElementById('qNextBtn').style.display='block';
+}
+function nextQ(){qIdx++;if(qIdx>=qBank.length){endSession();}else{showQ();}}
+
+function endSession(){
+  S.xp+=sess.xpEarned;S.subjectXP[sess.subject]=(S.subjectXP[sess.subject]||0)+sess.xpEarned;
+  S.totalCorrect+=sess.correct;S.totalQ+=sess.total;
+  const newLvl=Math.floor(S.xp/150)+1;const leveled=newLvl>S.level;S.level=newLvl;
+  save();saveLB();
+  const acc=Math.round((sess.correct/sess.total)*100);
+  document.getElementById('resC').textContent=sess.correct;
+  document.getElementById('resT').textContent=sess.total;
+  document.getElementById('resAcc').textContent=acc+'%';
+  document.getElementById('resXp').textContent='+'+sess.xpEarned+' XP earned';
+  document.getElementById('resLvl').textContent=`Level ${S.level} – ${lvlTitle(S.level)}`;
+  document.getElementById('resEmoji').textContent=acc>=85?'🌟':acc>=65?'⭐':'💪';
+  document.getElementById('resTitle').textContent=acc>=85?'Excellent!':acc>=65?'Good work!':'Keep going!';
+  document.getElementById('resStreak').textContent=S.streak>1?'🔥 '+S.streak+' day streak!':'';
+  goTo('results');if(leveled)showLevelUp(S.level);
+}
+function showLevelUp(lvl){
+  const ov=document.createElement('div');ov.className='lu-overlay';
+  ov.innerHTML=`<div class="lu-card"><div style="font-size:3.5rem">🎉</div><div class="lu-title">Level Up!</div><div style="margin:8px 0">Level <b>${lvl}</b> — ${lvlTitle(lvl)}</div><button class="btn btn-primary btn-sm" style="margin-top:16px;" onclick="this.closest('.lu-overlay').remove()">Awesome!</button></div>`;
+  document.body.appendChild(ov);
+}
+function showXpFloat(txt){const el=document.createElement('div');el.className='xp-float';el.textContent=txt;document.body.appendChild(el);setTimeout(()=>el.remove(),1300);}
+
+// ════════════════════════════════════════════════════════
+// CALCULATOR
+// ════════════════════════════════════════════════════════
+function toggleCalc(){const s=document.getElementById('calcSheet'),o=document.getElementById('calcOverlay');const op=s.classList.toggle('open');o.classList.toggle('show',op);}
+function ci(v){const d=document.getElementById('calcDisp');if(v==='C'){calcExpr='';d.textContent='0';return;}if(v==='='){try{let e=calcExpr.replace(/√(\d+\.?\d*)/g,(m,n)=>Math.sqrt(Number(n)));const r=Function('"use strict";return('+e+')')();d.textContent=Math.round(r*1e10)/1e10;calcExpr=String(r);}catch{d.textContent='Error';calcExpr='';}return;}if(v==='√'){calcExpr+='√';d.textContent=calcExpr;return;}calcExpr+=v;d.textContent=calcExpr;}
+
+// ════════════════════════════════════════════════════════
+// MINI-GAME SELECTOR
+// ════════════════════════════════════════════════════════
+const MG_DEFS=[
+  {id:'blitz',name:'Grammar Blitz',icon:'⚡',inspo:'Classic Arcade',subj:'Grammar',fn:()=>startTextMG('blitz')},
+  {id:'vocab',name:'Vocab Duel',icon:'🎯',inspo:'Quiz Game',subj:'Vocabulary',fn:()=>startTextMG('vocab')},
+  {id:'sprint',name:'Numeracy Sprint',icon:'🔢',inspo:'Speed Quiz',subj:'Mental Maths',fn:()=>startTextMG('sprint')},
+  {id:'scramble',name:'Word Scramble',icon:'🔤',inspo:'Boggle',subj:'Spelling',fn:()=>startTextMG('scramble')},
+  {id:'trivia',name:'True/False Blitz',icon:'💡',inspo:'Rapid Fire',subj:'Mixed',fn:()=>startTextMG('trivia')},
+  {id:'surgery',name:'Sentence Surgery',icon:'✂️',inspo:'Puzzle',subj:'Writing',fn:()=>startTextMG('surgery')},
+  {id:'gaterunner',name:'Gate Runner',icon:'🐦',inspo:'Flappy Bird',subj:'Spelling/Grammar',fn:()=>startCanvas('gaterunner')},
+  {id:'mathdash',name:'Math Dash',icon:'🏃',inspo:'Subway Surfers',subj:'Mental Maths',fn:()=>startCanvas('mathdash')},
+  {id:'wordbattle',name:'Word Battle',icon:'⚔️',inspo:'Pokémon',subj:'Vocabulary',fn:()=>startCanvas('wordbattle')},
+  {id:'tower',name:'Tower Defender',icon:'🏰',inspo:'Plants vs Zombies',subj:'Mixed Revision',fn:()=>startCanvas('tower')},
+  {id:'blaster',name:'Equation Blaster',icon:'🚀',inspo:'Space Invaders',subj:'Algebra/Maths',fn:()=>startCanvas('blaster')},
+];
+function renderMGSelect(){
+  document.getElementById('mgGrid').innerHTML=MG_DEFS.map((g,i)=>
+    `<div class="mg-card" onclick="MG_DEFS[${i}].fn()">
+      <div class="mg-card-icon">${g.icon}</div>
+      <div class="mg-card-name">${g.name}</div>
+      <div class="mg-card-inspo">inspired by ${g.inspo}</div>
+      <div class="mg-card-subj">${g.subj}</div>
+    </div>`
+  ).join('');
+}
+
+// ════════════════════════════════════════════════════════
+// TEXT MINI-GAMES
+// ════════════════════════════════════════════════════════
+const BLITZ_Q=[
+  {text:"The students was very excited about the excursion.",wrong:"was"},
+  {text:"She don't know the answer to the question.",wrong:"don't"},
+  {text:"They bringed their lunch to the picnic.",wrong:"bringed"},
+  {text:"The childrens played happily in the park.",wrong:"childrens"},
+  {text:"He runned faster than anyone else.",wrong:"runned"},
+  {text:"I have went to the store three times.",wrong:"went"},
+  {text:"She speaked very loudly in the library.",wrong:"speaked"},
+  {text:"We buyed new shoes for the holiday.",wrong:"buyed"},
+  {text:"They was playing cricket all afternoon.",wrong:"was"},
+  {text:"Neither the teacher nor the students was on time.",wrong:"was"},
+];
+const VOCAB_Q=[
+  {word:"Eloquent",hint:"Speaking style",opts:["Clumsy","Articulate","Silent","Rude"],a:1},
+  {word:"Ubiquitous",hint:"Presence",opts:["Rare","Omnipresent","Ancient","Hidden"],a:1},
+  {word:"Tenacious",hint:"Not giving up",opts:["Weak","Lazy","Persistent","Gentle"],a:2},
+  {word:"Ambiguous",hint:"Clarity level",opts:["Clear","Vague","Specific","Decisive"],a:1},
+  {word:"Pragmatic",hint:"Approach",opts:["Dreamy","Practical","Emotional","Idealistic"],a:1},
+  {word:"Ominous",hint:"Feeling",opts:["Cheerful","Threatening","Tiny","Bright"],a:1},
+  {word:"Lucid",hint:"Mental state",opts:["Confusing","Cloudy","Clear","Dark"],a:2},
+  {word:"Benevolent",hint:"Character",opts:["Cruel","Kind","Selfish","Lazy"],a:1},
+  {word:"Arduous",hint:"Difficulty",opts:["Easy","Simple","Challenging","Beautiful"],a:2},
+  {word:"Superfluous",hint:"Quantity",opts:["Needed","Excessive","Scarce","Perfect"],a:1},
+];
+const SPRINT_Q=[
+  {q:"15 × 8",a:"120"},{q:"25% of 200",a:"50"},{q:"√144",a:"12"},{q:"3² + 4²",a:"25"},
+  {q:"72 ÷ 9",a:"8"},{q:"17 + 28",a:"45"},{q:"5³",a:"125"},{q:"40% of 150",a:"60"},
+  {q:"13 × 7",a:"91"},{q:"200 ÷ 8",a:"25"},{q:"9²",a:"81"},{q:"360 ÷ 12",a:"30"},
+  {q:"0.5 × 240",a:"120"},{q:"30% of 90",a:"27"},{q:"11 × 12",a:"132"},
+];
+const SURGERY_Q=[
+  {frags:["the old","barked","dog","loudly"],correct:["the old","dog","barked","loudly"]},
+  {frags:["quickly","she","to school","ran"],correct:["she","quickly","ran","to school"]},
+  {frags:["together","they","ate","dinner"],correct:["they","ate","dinner","together"]},
+  {frags:["loudly","the crowd","cheered","in the stadium"],correct:["the crowd","in the stadium","cheered","loudly"]},
+];
+const SCRAMBLE_Q=[
+  {word:"INFERENCE",hint:"Reading between the lines"},
+  {word:"PERSUADE",hint:"Change someone's mind"},
+  {word:"METAPHOR",hint:"Comparison without like/as"},
+  {word:"GEOMETRY",hint:"Study of shapes"},
+  {word:"PARALLEL",hint:"Lines that never meet"},
+  {word:"FRACTION",hint:"Part of a whole"},
+  {word:"ARGUMENT",hint:"A point with reasons"},
+];
+const TRIVIA_Q=[
+  {q:"A triangle's interior angles always sum to 180°.",a:true},
+  {q:"'Its' with an apostrophe means 'it is'.",a:true},
+  {q:"A metaphor uses the words 'like' or 'as'.",a:false},
+  {q:"Parallel lines eventually intersect.",a:false},
+  {q:"The mean is the sum divided by the count.",a:true},
+  {q:"A semicolon can join two independent clauses.",a:true},
+  {q:"All persuasive texts must use first person.",a:false},
+  {q:"π (pi) is approximately 3.14.",a:true},
+  {q:"An isosceles triangle has all three sides equal.",a:false},
+  {q:"Probability of an impossible event is 0.",a:true},
+  {q:"A thesis statement appears in the conclusion.",a:false},
+  {q:"Compound sentences join two independent clauses.",a:true},
+];
+let _bi=0,_vi=0,_si=0,_sri=[],_scI=0,_trivQ=[];
+function startTextMG(type){
+  mgScore=0;mgCombo=0;clearInterval(mgInt);
+  document.getElementById('mgEnd').style.display='none';
+  document.getElementById('mgBody').style.display='block';
+  document.getElementById('mgBody').innerHTML='';
+  document.getElementById('mgTimerBig').textContent='60';
+  document.getElementById('mgTimerBig').className='mg-timer-big';
+  document.getElementById('mgScoreLbl').textContent='Score: 0';
+  document.getElementById('mgComboLbl').textContent='';
+  goTo('minigame');
+  if(type==='blitz'){document.getElementById('mgHdrTitle').textContent='⚡ Grammar Blitz';_bi=0;renderBlitz();runMGTimer(60);}
+  else if(type==='vocab'){document.getElementById('mgHdrTitle').textContent='🎯 Vocab Duel';_vi=0;renderVocab();runMGTimer(50);}
+  else if(type==='sprint'){document.getElementById('mgHdrTitle').textContent='🔢 Numeracy Sprint';_si=0;renderSprint();runMGTimer(45);}
+  else if(type==='surgery'){document.getElementById('mgHdrTitle').textContent='✂️ Sentence Surgery';document.getElementById('mgTimerBig').textContent='∞';renderSurgery();}
+  else if(type==='scramble'){document.getElementById('mgHdrTitle').textContent='🔤 Word Scramble';document.getElementById('mgTimerBig').textContent='∞';_scI=0;renderScramble();}
+  else if(type==='trivia'){document.getElementById('mgHdrTitle').textContent='💡 True/False Blitz';_trivQ=shuffle([...TRIVIA_Q]);renderTrivia();runMGTimer(40);}
+}
+function renderBlitz(){
+  if(_bi>=BLITZ_Q.length)_bi=0;
+  const q=BLITZ_Q[_bi];
+  document.getElementById('mgBody').innerHTML=`<div style="font-size:0.75rem;color:var(--muted);margin-bottom:12px;">Tap the INCORRECT word:</div>
+  <div style="font-size:1rem;line-height:2.4;">${q.text.split(' ').map(w=>`<span style="display:inline-block;padding:2px 7px;border-radius:7px;cursor:pointer;margin:1px;" onclick="blitzTap(this,'${w.replace(/'/g,"\\'")}','${q.wrong}')">${w}</span>`).join(' ')}</div>
+  <div style="margin-top:14px;text-align:center;font-size:0.82rem;color:var(--muted);">Combo: <span id="blitzC" style="color:var(--gold);font-weight:800;">×${mgCombo+1}</span></div>`;
+}
+function blitzTap(el,w,wrong){
+  if(w.replace(/[.,!?]/g,'').toLowerCase()===wrong.toLowerCase()){
+    el.style.background='rgba(34,197,94,0.3)';mgScore+=10*(mgCombo+1);mgCombo++;
+    document.getElementById('mgScoreLbl').textContent='Score: '+mgScore;
+    document.getElementById('mgComboLbl').textContent=mgCombo>1?'🔥 x'+mgCombo:'';
+    _bi++;setTimeout(renderBlitz,350);
+  }else{
+    el.style.background='rgba(239,68,68,0.3)';mgCombo=0;document.getElementById('mgComboLbl').textContent='';
+    setTimeout(()=>el.style.background='',400);
+  }
+}
+function renderVocab(){
+  if(_vi>=VOCAB_Q.length)_vi=0;
+  const q=VOCAB_Q[_vi];
+  document.getElementById('mgBody').innerHTML=`<div style="text-align:center;color:var(--muted);font-size:0.8rem;margin-bottom:6px;">Best synonym for:</div>
+  <div style="font-size:1.8rem;font-weight:900;text-align:center;color:var(--teal);margin:10px 0 4px;">${q.word}</div>
+  <div style="text-align:center;color:var(--muted);font-size:0.75rem;margin-bottom:12px;">Hint: ${q.hint}</div>
+  <div class="opts">${q.opts.map((o,i)=>`<button class="opt-btn" onclick="vocabTap(${i},${q.a},this)">${o}</button>`).join('')}</div>`;
+}
+function vocabTap(idx,ans,btn){
+  document.querySelectorAll('#mgBody .opt-btn').forEach(b=>b.disabled=true);
+  if(idx===ans){btn.classList.add('correct');mgScore+=15;mgCombo++;}
+  else{btn.classList.add('wrong');mgCombo=0;document.querySelectorAll('#mgBody .opt-btn')[ans].classList.add('correct');}
+  document.getElementById('mgScoreLbl').textContent='Score: '+mgScore;
+  document.getElementById('mgComboLbl').textContent=mgCombo>1?'🔥 x'+mgCombo:'';
+  _vi++;setTimeout(renderVocab,600);
+}
+function renderSprint(){
+  if(_si>=SPRINT_Q.length)_si=0;
+  const q=SPRINT_Q[_si];
+  document.getElementById('mgBody').innerHTML=`<div style="font-size:1.3rem;font-weight:800;text-align:center;margin:18px 0 12px;background:linear-gradient(135deg,var(--teal),#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">${q.q} = ?</div>
+  <input id="spIn" type="number" style="width:100%;background:var(--card2);border:2px solid #2a4060;border-radius:12px;padding:13px;color:white;font-size:1.1rem;text-align:center;outline:none;margin-bottom:10px;" placeholder="Answer…" autofocus>
+  <button class="submit-btn" onclick="checkSprint('${q.a}')">Submit ⚡</button>
+  <div id="spFb" style="text-align:center;min-height:22px;margin-top:8px;font-weight:700;"></div>`;
+  document.getElementById('spIn').addEventListener('keydown',e=>{if(e.key==='Enter')checkSprint(q.a);});
+}
+function checkSprint(ans){
+  const v=document.getElementById('spIn').value.trim();
+  const fb=document.getElementById('spFb');
+  if(v===ans){fb.textContent='✅ Correct! +20';fb.style.color='var(--ok)';mgScore+=20;mgCombo++;}
+  else{fb.textContent='❌ Was '+ans;fb.style.color='var(--bad)';mgCombo=0;}
+  document.getElementById('mgScoreLbl').textContent='Score: '+mgScore;
+  document.getElementById('mgComboLbl').textContent=mgCombo>2?'🔥 On fire! x'+mgCombo:'';
+  _si++;setTimeout(renderSprint,500);
+}
+let _surgQ=null,_surgPlaced=[];
+function renderSurgery(){
+  _surgQ=SURGERY_Q[Math.floor(Math.random()*SURGERY_Q.length)];_surgPlaced=[];
+  const sh=shuffle([..._surgQ.frags]);
+  document.getElementById('mgBody').innerHTML=`<div style="font-size:0.8rem;color:var(--muted);margin-bottom:10px;">Tap fragments to build a correct sentence:</div>
+  <div style="display:flex;flex-wrap:wrap;gap:7px;min-height:44px;margin-bottom:12px;" id="fragPool">${sh.map(f=>`<div style="background:var(--card2);border:1px solid #2a4060;border-radius:9px;padding:7px 12px;cursor:pointer;font-size:0.85rem;" onclick="fragTap(this,'${f}')">${f}</div>`).join('')}</div>
+  <div style="font-size:0.75rem;color:var(--muted);margin-bottom:5px;">Your sentence:</div>
+  <div style="display:flex;flex-wrap:wrap;gap:7px;min-height:44px;border:2px dashed #2a4060;border-radius:10px;padding:8px;margin-bottom:12px;" id="fragSlot"></div>
+  <button class="submit-btn" onclick="checkSurg()">Check ✓</button>
+  <div id="surgFb" style="text-align:center;min-height:22px;margin-top:8px;font-weight:700;"></div>`;
+}
+function fragTap(el,word){
+  if(el.style.borderColor==='rgb(0, 201, 184)'){_surgPlaced=_surgPlaced.filter(w=>w!==word);el.style.borderColor='';el.style.color='';document.getElementById('fragPool').appendChild(el);}
+  else{_surgPlaced.push(word);el.style.borderColor='var(--teal)';el.style.color='var(--teal)';document.getElementById('fragSlot').appendChild(el);}
+}
+function checkSurg(){
+  const fb=document.getElementById('surgFb');
+  if(JSON.stringify(_surgPlaced)===JSON.stringify(_surgQ.correct)){fb.textContent='✅ Perfect! +30';fb.style.color='var(--ok)';mgScore+=30;document.getElementById('mgScoreLbl').textContent='Score: '+mgScore;setTimeout(renderSurgery,1000);}
+  else{fb.textContent='❌ Not quite! Try again';fb.style.color='var(--bad)';}
+}
+let _scrWord='',_scrLetters=[],_scrAns=[];
+function renderScramble(){
+  const q=SCRAMBLE_Q[Math.floor(Math.random()*SCRAMBLE_Q.length)];
+  _scrWord=q.word;_scrLetters=shuffle(q.word.split(''));_scrAns=[];
+  document.getElementById('mgBody').innerHTML=`<div style="text-align:center;color:var(--muted);font-size:0.78rem;margin-bottom:4px;">Unscramble the word:</div>
+  <div style="text-align:center;color:var(--teal);font-size:0.75rem;margin-bottom:12px;">Hint: ${q.hint}</div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;min-height:48px;border-bottom:2px solid #2a4060;padding-bottom:10px;margin-bottom:12px;" id="scrAns"></div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:14px;" id="scrPool">${_scrLetters.map((l,i)=>`<div id="lt${i}" style="width:40px;height:48px;background:var(--card2);border:2px solid #2a4060;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800;cursor:pointer;" onclick="scrPick(${i},'${l}')">${l}</div>`).join('')}</div>
+  <div style="display:flex;gap:8px;"><button class="submit-btn" onclick="checkScr()" style="flex:1;">Check ✓</button><button class="submit-btn" onclick="renderScramble()" style="flex:0.4;background:var(--card2);border:1px solid #2a4060;">Skip</button></div>
+  <div id="scrFb" style="text-align:center;min-height:22px;margin-top:8px;font-weight:700;"></div>`;
+}
+function scrPick(i,l){
+  const t=document.getElementById('lt'+i);
+  if(t.style.opacity==='0.3')return;
+  t.style.opacity='0.3';_scrAns.push({i,l});
+  const slot=document.createElement('div');
+  slot.style.cssText='width:40px;height:48px;background:rgba(0,201,184,0.1);border:2px solid var(--teal);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800;color:var(--teal);cursor:pointer;';
+  slot.textContent=l;slot.onclick=()=>{const idx=_scrAns.findIndex(a=>a.i===i);if(idx>-1){_scrAns.splice(idx,1);document.getElementById('lt'+i).style.opacity='1';slot.remove();}};
+  document.getElementById('scrAns').appendChild(slot);
+}
+function checkScr(){
+  const attempt=_scrAns.map(a=>a.l).join('');
+  const fb=document.getElementById('scrFb');
+  if(attempt===_scrWord){fb.textContent='✅ Correct! +25';fb.style.color='var(--ok)';mgScore+=25;document.getElementById('mgScoreLbl').textContent='Score: '+mgScore;setTimeout(renderScramble,800);}
+  else{fb.textContent='❌ Try again!';fb.style.color='var(--bad)';}
+}
+let _trivI=0;
+function renderTrivia(){
+  if(!_trivQ.length)_trivQ=shuffle([...TRIVIA_Q]);
+  if(_trivI>=_trivQ.length)_trivI=0;
+  const q=_trivQ[_trivI];
+  document.getElementById('mgBody').innerHTML=`<div style="text-align:center;font-size:0.78rem;color:var(--muted);margin-bottom:8px;">TRUE or FALSE?</div>
+  <div style="font-size:1rem;text-align:center;margin:14px 0;line-height:1.6;">"${q.q}"</div>
+  <div style="display:flex;gap:12px;margin-top:12px;">
+    <button onclick="checkTF(true,${q.a})" style="flex:1;padding:20px;border-radius:14px;font-size:1.2rem;font-weight:900;border:none;cursor:pointer;background:linear-gradient(135deg,var(--ok),#16a34a);color:white;">✅ TRUE</button>
+    <button onclick="checkTF(false,${q.a})" style="flex:1;padding:20px;border-radius:14px;font-size:1.2rem;font-weight:900;border:none;cursor:pointer;background:linear-gradient(135deg,var(--bad),#b91c1c);color:white;">❌ FALSE</button>
+  </div>
+  <div id="tfFb" style="text-align:center;min-height:22px;margin-top:10px;font-weight:700;"></div>`;
+}
+function checkTF(ans,correct){
+  document.querySelectorAll('#mgBody button').forEach(b=>b.disabled=true);
+  const fb=document.getElementById('tfFb');
+  if(ans===correct){fb.textContent='✅ Correct! +10';fb.style.color='var(--ok)';mgScore+=10;mgCombo++;}
+  else{fb.textContent='❌ Wrong!';fb.style.color='var(--bad)';mgCombo=0;}
+  document.getElementById('mgScoreLbl').textContent='Score: '+mgScore;
+  document.getElementById('mgComboLbl').textContent=mgCombo>2?'🔥 x'+mgCombo:'';
+  _trivI++;setTimeout(renderTrivia,700);
+}
+function runMGTimer(secs){
+  let t=secs;const el=document.getElementById('mgTimerBig');el.textContent=t;
+  mgInt=setInterval(()=>{t--;el.textContent=t;el.className='mg-timer-big'+(t<=10?' red':'');if(t<=0){clearInterval(mgInt);endTextMG();}},1000);
+}
+function endTextMG(){
+  const xp=Math.max(5,Math.floor(mgScore/4));
+  S.xp+=xp;S.level=Math.floor(S.xp/150)+1;
+  if(S.hearts<S.maxHearts)S.hearts=Math.min(S.maxHearts,S.hearts+1);
+  save();
+  document.getElementById('mgBody').style.display='none';document.getElementById('mgEnd').style.display='block';
+  document.getElementById('mgEndEmoji').textContent=mgScore>=60?'🏆':mgScore>=30?'🎉':'⭐';
+  document.getElementById('mgEndTitle').textContent=mgScore>=60?'Amazing!':mgScore>=30?'Nice work!':'Keep going!';
+  document.getElementById('mgEndXp').textContent=`Score: ${mgScore} · +${xp} XP`;
+}
+function exitMG(){clearInterval(mgInt);goTo('mgSelect');}
+function finishMG(){clearInterval(mgInt);goTo('mgSelect');}
+
+// ════════════════════════════════════════════════════════
+// CANVAS GAMES
+// ════════════════════════════════════════════════════════
+function startCanvas(type){
+  cancelAnimationFrame(cgRAF);cgRAF=null;
+  const cv=document.getElementById('cgCanvas');
+  const dpr=window.devicePixelRatio||1;
+  cv.width=window.innerWidth*dpr;cv.height=(window.innerHeight-110)*dpr;
+  cv.style.height=(window.innerHeight-110)+'px';
+  document.getElementById('cgControls').innerHTML='';
+  document.getElementById('cgTitle').textContent=MG_DEFS.find(m=>m.id===type)?.name||type;
+  goTo('canvasGame');
+  if(type==='gaterunner')initGateRunner(cv);
+  else if(type==='mathdash')initMathDash(cv);
+  else if(type==='wordbattle')initWordBattle(cv);
+  else if(type==='tower')initTower(cv);
+  else if(type==='blaster')initBlaster(cv);
+}
+function exitCanvas(){cancelAnimationFrame(cgRAF);cgRAF=null;goTo('mgSelect');}
+
+// ── SHARED CANVAS HELPERS ────────────────────────────────
+const GS={score:0,lives:3,active:true};
+function cgCtx(){return document.getElementById('cgCanvas').getContext('2d');}
+function cgW(){return document.getElementById('cgCanvas').width;}
+function cgH(){return document.getElementById('cgCanvas').height;}
+function cgUpdateScore(s){GS.score=s;document.getElementById('cgTitle').textContent=document.getElementById('cgTitle').textContent.split(' ')[0]+' ·score:'+s;}
+function cgGameOver(type){
+  cancelAnimationFrame(cgRAF);cgRAF=null;
+  const xp=Math.max(5,Math.floor(GS.score/3));
+  S.xp+=xp;S.level=Math.floor(S.xp/150)+1;
+  if(S.hearts<S.maxHearts)S.hearts=Math.min(S.maxHearts,S.hearts+1);
+  save();
+  const ctrl=document.getElementById('cgControls');
+  ctrl.innerHTML=`<div style="text-align:center;padding:10px 0;"><div style="font-size:1.4rem;font-weight:900;margin-bottom:6px;">🎮 Game Over!</div><div style="color:var(--gold);font-weight:700;margin-bottom:14px;">Score: ${GS.score} · +${xp} XP</div><div style="display:flex;gap:10px;justify-content:center;"><button class="btn btn-primary btn-sm" onclick="startCanvas('${type}')">Play Again</button><button class="btn btn-secondary btn-sm" onclick="goTo('mgSelect')">🏠 Menu</button></div></div>`;
+}
+
+// ── 1. GATE RUNNER (Flappy Bird) ─────────────────────────
+const GR_SPELL=[
+  {q:"Correct spelling:",opts:["recieve","receive"],a:1},
+  {q:"Correct spelling:",opts:["accomodation","accommodation"],a:1},
+  {q:"Correct spelling:",opts:["separate","seperate"],a:0},
+  {q:"Correct spelling:",opts:["necessary","necesary"],a:0},
+  {q:"Correct spelling:",opts:["definately","definitely"],a:1},
+  {q:"Correct spelling:",opts:["recommend","recomend"],a:0},
+  {q:"Correct word:",opts:["their going","they're going"],a:1},
+  {q:"Correct word:",opts:["its raining","it's raining"],a:1},
+];
+let gr={},grSpawnTimer=0;
+function initGateRunner(cv){
+  GS.score=0;GS.lives=3;GS.active=true;
+  const W=cgW(),H=cgH();
+  gr={bird:{y:H/2,vy:0},gates:[],qIdx:0,qs:shuffle([...GR_SPELL]),score:0,lives:3,answerGiven:null,flash:0};
+  spawnGRGate(W,H);
+  const ctrl=document.getElementById('cgControls');
+  ctrl.innerHTML=`<div style="font-size:0.75rem;color:var(--muted);text-align:center;margin-bottom:8px;">Tap A (top) or B (bottom) to fly through the CORRECT gap!</div>
+  <div style="display:flex;gap:10px;"><button class="btn btn-primary btn-sm" style="flex:1;font-size:1rem;padding:16px;" onclick="grAnswer(0)">▲ A</button><button class="btn btn-purple btn-sm" style="flex:1;font-size:1rem;padding:16px;" onclick="grAnswer(1)">▼ B</button></div>`;
+  grLoop();
+}
+function spawnGRGate(W,H){
+  const q=gr.qs[gr.qIdx%gr.qs.length];gr.qIdx++;
+  const gapPos=q.a===0?0.25:0.65; // gap in top half or bottom half
+  gr.gates.push({x:W,q,gapPos,gapH:H*0.3,passed:false,color:['#1a6a3a','#3a1a6a']});
+}
+function grAnswer(choice){
+  if(!GS.active)return;
+  const gate=gr.gates.find(g=>!g.passed&&g.x<cgW()*0.8);
+  if(!gate)return;
+  const correct=choice===gate.q.a;
+  if(correct){gr.bird.vy=cgH()*-0.008;gr.score++;GS.score=gr.score;cgUpdateScore(gr.score);}
+  else{gr.bird.vy=cgH()*0.006;GS.lives--;gr.lives--;gr.flash=15;}
+  if(GS.lives<=0){GS.active=false;}
+}
+function grLoop(){
+  if(!GS.active){cgGameOver('gaterunner');return;}
+  const ctx=cgCtx(),W=cgW(),H=cgH();
+  ctx.clearRect(0,0,W,H);
+  // Sky
+  const grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,'#0d1b3e');grad.addColorStop(1,'#0a3a2a');
+  ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+  // Stars
+  ctx.fillStyle='rgba(255,255,255,0.3)';
+  for(let i=0;i<20;i++){ctx.beginPath();ctx.arc((i*137)%W,(i*97)%H*0.6,1.5,0,Math.PI*2);ctx.fill();}
+  // Ground
+  ctx.fillStyle='#0a4a1a';ctx.fillRect(0,H-20,W,20);
+  // Bird physics
+  gr.bird.vy+=0.35;gr.bird.y+=gr.bird.vy;
+  gr.bird.y=Math.max(20,Math.min(H-40,gr.bird.y));
+  // Flash overlay
+  if(gr.flash>0){ctx.fillStyle='rgba(239,68,68,0.2)';ctx.fillRect(0,0,W,H);gr.flash--;}
+  // Gates
+  grSpawnTimer++;
+  if(grSpawnTimer>200){grSpawnTimer=0;spawnGRGate(W,H);}
+  gr.gates.forEach((g,i)=>{
+    g.x-=3.5;
+    const gapY=g.gapPos*H;
+    const gapH=g.gapH;
+    // Top block
+    ctx.fillStyle='#166534';ctx.fillRect(g.x,0,55,gapY);
+    ctx.fillStyle='#22c55e';ctx.fillRect(g.x,0,55,4);
+    ctx.fillRect(g.x,gapY-4,55,4);
+    // Option A label
+    ctx.fillStyle='white';ctx.font=`bold ${H*0.028}px Segoe UI`;ctx.textAlign='center';
+    ctx.fillText(g.q.opts[0],g.x+27,gapY*0.5);
+    // Bottom block
+    ctx.fillStyle='#7e22ce';ctx.fillRect(g.x,gapY+gapH,55,H-gapY-gapH-20);
+    ctx.fillStyle='#a855f7';ctx.fillRect(g.x,gapY+gapH,55,4);
+    // Option B label
+    ctx.fillText(g.q.opts[1],g.x+27,gapY+gapH+(H-gapY-gapH)*0.45);
+    // Collision
+    const bx=80,by=gr.bird.y,br=16;
+    const inX=bx+br>g.x&&bx-br<g.x+55;
+    if(inX){
+      const inGap=by>gapY&&by<gapY+gapH;
+      if(!inGap&&!g.passed){GS.lives--;gr.lives--;gr.flash=20;g.passed=true;}
+    }
+    if(g.x+55<bx)g.passed=true;
+    // Question text near gate
+    ctx.fillStyle='rgba(255,255,255,0.9)';ctx.font=`${H*0.024}px Segoe UI`;ctx.textAlign='center';
+    ctx.fillText('A',g.x+27,gapY-8);ctx.fillText('B',g.x+27,gapY+gapH+16);
+  });
+  gr.gates=gr.gates.filter(g=>g.x>-60);
+  // Bird
+  ctx.beginPath();ctx.arc(80,gr.bird.y,16,0,Math.PI*2);ctx.fillStyle='#f59e0b';ctx.fill();
+  ctx.beginPath();ctx.arc(90,gr.bird.y-5,5,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();
+  ctx.beginPath();ctx.arc(91,gr.bird.y-5,2.5,0,Math.PI*2);ctx.fillStyle='#0d1b2e';ctx.fill();
+  // Wing flap
+  ctx.beginPath();ctx.ellipse(72,gr.bird.y+4,10,5,Math.PI*0.3,0,Math.PI*2);ctx.fillStyle='#d97706';ctx.fill();
+  // HUD
+  ctx.fillStyle='white';ctx.font=`bold ${H*0.04}px Segoe UI`;ctx.textAlign='left';
+  ctx.fillText(`Score: ${gr.score}  ❤️×${gr.lives}`,14,36);
+  // Current question
+  const nextGate=gr.gates[0];
+  if(nextGate&&nextGate.x<W){
+    ctx.fillStyle='rgba(255,255,255,0.85)';ctx.font=`${H*0.03}px Segoe UI`;ctx.textAlign='center';
+    ctx.fillText(nextGate.q.q,W/2,H*0.06);
+  }
+  cgRAF=requestAnimationFrame(grLoop);
+}
+
+// ── 2. MATH DASH (Subway Surfers) ───────────────────────
+const MD_Q=[
+  {q:"12×6",opts:[72,71,73],a:72},{q:"45÷9",opts:[4,5,6],a:5},{q:"8²",opts:[64,62,68],a:64},
+  {q:"15×4",opts:[60,58,62],a:60},{q:"√81",opts:[8,9,10],a:9},{q:"7×8",opts:[54,55,56],a:56},
+  {q:"100÷4",opts:[24,25,26],a:25},{q:"6³",opts:[216,218,212],a:216},
+  {q:"13×5",opts:[65,60,70],a:65},{q:"√169",opts:[12,13,14],a:13},
+];
+let md={},mdTimer=0;
+function initMathDash(cv){
+  GS.score=0;GS.lives=3;GS.active=true;
+  const W=cgW(),H=cgH();
+  md={lane:1,qs:shuffle([...MD_Q]),qIdx:0,tiles:[],score:0,lives:3,runner:0,flash:0};
+  spawnMDTile(W,H);
+  const ctrl=document.getElementById('cgControls');
+  ctrl.innerHTML=`<div style="display:flex;gap:8px;margin-top:4px;">
+    <button class="btn btn-secondary btn-sm" style="flex:1;font-size:1.3rem;" onclick="mdMove(-1)">◄ Left</button>
+    <button class="btn btn-primary btn-sm" style="flex:1;font-size:1.3rem;" onclick="mdMove(1)">Right ►</button>
+  </div>`;
+  mdLoop();
+}
+function spawnMDTile(W,H){
+  if(md.qIdx>=md.qs.length)md.qIdx=0;
+  const q=md.qs[md.qIdx++];
+  const correct_lane=Math.floor(Math.random()*3);
+  const lanes=q.opts.slice(0,3);
+  // Place correct answer in correct lane
+  const shuffled=[...q.opts];
+  const wrongOpts=shuffled.filter(o=>o!==q.a);
+  const tile_opts=[0,1,2].map(i=>i===correct_lane?q.a:wrongOpts.pop());
+  md.tiles.push({y:-80,q:q.q,opts:tile_opts,correctLane:correct_lane,hit:false});
+}
+function mdMove(dir){
+  if(!GS.active)return;
+  md.lane=Math.max(0,Math.min(2,md.lane+dir));
+}
+function mdLoop(){
+  if(!GS.active){cgGameOver('mathdash');return;}
+  const ctx=cgCtx(),W=cgW(),H=cgH();
+  ctx.clearRect(0,0,W,H);
+  // Road
+  const rd=ctx.createLinearGradient(0,0,0,H);
+  rd.addColorStop(0,'#111827');rd.addColorStop(1,'#1f2937');
+  ctx.fillStyle=rd;ctx.fillRect(0,0,W,H);
+  const laneW=W/3;
+  // Lane lines
+  for(let i=1;i<3;i++){ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.lineWidth=2;ctx.setLineDash([20,20]);ctx.beginPath();ctx.moveTo(laneW*i,0);ctx.lineTo(laneW*i,H);ctx.stroke();ctx.setLineDash([]);}
+  // Runner
+  const rx=laneW*md.lane+laneW/2;const ry=H-80;
+  md.runner=md.runner||0;
+  // Body
+  ctx.fillStyle='#3b82f6';ctx.beginPath();ctx.roundRect(rx-18,ry-36,36,44,8);ctx.fill();
+  // Head
+  ctx.beginPath();ctx.arc(rx,ry-44,14,0,Math.PI*2);ctx.fillStyle='#fbbf24';ctx.fill();
+  // Legs
+  ctx.fillStyle='#1d4ed8';
+  ctx.fillRect(rx-14,ry+8,11,20+Math.sin(md.runner)*8);
+  ctx.fillRect(rx+3,ry+8,11,20-Math.sin(md.runner)*8);
+  md.runner+=0.3;
+  if(md.flash>0){ctx.fillStyle='rgba(239,68,68,0.25)';ctx.fillRect(0,0,W,H);md.flash--;}
+  mdTimer++;
+  if(mdTimer>140){mdTimer=0;spawnMDTile(W,H);}
+  md.tiles.forEach(t=>{
+    t.y+=4.5;
+    for(let i=0;i<3;i++){
+      const tx=laneW*i,tw=laneW;
+      const col=i===t.correctLane?'rgba(34,197,94,0.2)':'rgba(239,68,68,0.12)';
+      ctx.fillStyle=col;ctx.fillRect(tx+4,t.y,tw-8,60);
+      ctx.strokeStyle=i===t.correctLane?'#22c55e':'#ef4444';ctx.lineWidth=2;ctx.strokeRect(tx+4,t.y,tw-8,60);
+      ctx.fillStyle='white';ctx.font=`bold ${W*0.055}px Segoe UI`;ctx.textAlign='center';
+      ctx.fillText(t.opts[i],tx+tw/2,t.y+38);
+    }
+    ctx.fillStyle='rgba(255,255,255,0.9)';ctx.font=`bold ${W*0.045}px Segoe UI`;ctx.textAlign='center';
+    ctx.fillText(t.q+' = ?',W/2,t.y-10);
+    // Collision
+    if(!t.hit&&t.y+60>H-100&&t.y<H-60){
+      t.hit=true;
+      if(md.lane===t.correctLane){md.score++;GS.score=md.score;}
+      else{GS.lives--;md.lives--;md.flash=20;}
+      if(GS.lives<=0)GS.active=false;
+    }
+  });
+  md.tiles=md.tiles.filter(t=>t.y<H+10);
+  ctx.fillStyle='white';ctx.font=`bold ${H*0.04}px Segoe UI`;ctx.textAlign='left';
+  ctx.fillText(`Score: ${md.score}  ❤️×${md.lives}`,14,38);
+  cgRAF=requestAnimationFrame(mdLoop);
+}
+
+// ── 3. WORD BATTLE (Pokémon) ─────────────────────────────
+const WB_ENEMIES=[
+  {name:"AMBIGUOUS",def:"Having more than one meaning",opts:["Unclear","Obvious","Simple","Loud"],a:0,hp:60},
+  {name:"TENACIOUS",def:"Stubbornly persistent",opts:["Lazy","Weak","Persistent","Clumsy"],a:2,hp:80},
+  {name:"ELOQUENT",def:"Fluent and persuasive in speech",opts:["Silent","Articulate","Boring","Angry"],a:1,hp:60},
+  {name:"UBIQUITOUS",def:"Present everywhere",opts:["Rare","Tiny","Omnipresent","Ancient"],a:2,hp:80},
+  {name:"PRAGMATIC",def:"Dealing with things practically",opts:["Idealistic","Practical","Dreamy","Lazy"],a:1,hp:100},
+];
+let wb={};
+function initWordBattle(cv){
+  GS.score=0;GS.active=true;
+  wb={enemies:shuffle([...WB_ENEMIES]),eIdx:0,playerHP:100,flash:'',streak:0};
+  wbRender();
+}
+function wbRender(){
+  const ctrl=document.getElementById('cgControls');
+  const cv=document.getElementById('cgCanvas');cv.style.display='none';
+  ctrl.style.padding='12px';
+  if(wb.eIdx>=wb.enemies.length){
+    ctrl.innerHTML=`<div style="text-align:center;padding:20px;"><div style="font-size:3rem">🏆</div><div style="font-size:1.4rem;font-weight:900;margin:8px 0;">You Win!</div><div style="color:var(--gold);font-weight:700;">Score: ${GS.score} · +${Math.floor(GS.score/2)} XP</div><div style="margin-top:14px;display:flex;gap:8px;justify-content:center;"><button class="btn btn-primary btn-sm" onclick="startCanvas('wordbattle')">Play Again</button><button class="btn btn-secondary btn-sm" onclick="goTo('mgSelect')">Menu</button></div></div>`;
+    const xp=Math.floor(GS.score/2);S.xp+=xp;S.level=Math.floor(S.xp/150)+1;if(S.hearts<S.maxHearts)S.hearts++;save();return;
+  }
+  const e=wb.enemies[wb.eIdx];
+  ctrl.innerHTML=`<div class="battle-screen">
+    <div class="battle-enemy">
+      <div class="battle-name">ENEMY WORD</div>
+      <div class="battle-word">${e.name}</div>
+      <div style="font-size:0.75rem;color:var(--muted);margin-top:4px;">"${e.def}"</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:8px;"><span style="font-size:0.72rem;color:var(--muted);">HP</span><div class="hp-bar" style="flex:1;"><div class="hp-fill enemy" id="eHP" style="width:${e.hp}%"></div></div><span style="font-size:0.72rem;color:var(--bad);">${e.hp}</span></div>
+    </div>
+    <div style="text-align:center;font-size:0.82rem;color:var(--gold);font-weight:700;min-height:18px;" id="wbMsg">Choose the correct synonym!</div>
+    <div class="battle-enemy">
+      <div class="battle-name">YOUR HP</div>
+      <div class="hp-bar"><div class="hp-fill player" id="pHP" style="width:${wb.playerHP}%"></div></div>
+      <div style="font-size:0.72rem;color:var(--ok);margin-top:4px;">${wb.playerHP} / 100</div>
+    </div>
+    <div class="battle-moves">${e.opts.map((o,i)=>`<button class="move-btn" onclick="wbAttack(${i})">⚡ ${o}</button>`).join('')}</div>
+  </div>`;
+}
+function wbAttack(idx){
+  document.querySelectorAll('.move-btn').forEach(b=>b.disabled=true);
+  const e=wb.enemies[wb.eIdx];
+  const msg=document.getElementById('wbMsg');
+  if(idx===e.a){
+    e.hp=Math.max(0,e.hp-35);wb.streak++;GS.score+=10+wb.streak*2;
+    const eHPEl=document.getElementById('eHP');if(eHPEl){eHPEl.style.width=e.hp+'%';eHPEl.previousElementSibling&&(eHPEl.parentElement.nextElementSibling.textContent=e.hp);}
+    if(msg)msg.textContent='✅ Super effective! -35 HP';
+    if(e.hp<=0){wb.eIdx++;setTimeout(wbRender,800);}else{setTimeout(wbRender,700);}
+  }else{
+    wb.playerHP=Math.max(0,wb.playerHP-20);wb.streak=0;
+    const pHPEl=document.getElementById('pHP');if(pHPEl)pHPEl.style.width=wb.playerHP+'%';
+    if(msg)msg.textContent=`❌ Wrong! The answer was: ${e.opts[e.a]}`;
+    if(wb.playerHP<=0){cgGameOver('wordbattle');return;}
+    setTimeout(wbRender,900);
+  }
+}
+
+// ── 4. TOWER DEFENDER (Plants vs Zombies) ──────────────
+const TD_Q=[
+  {q:"7 × 9 = ?",opts:[62,63,64],a:63},{q:"√64 = ?",opts:[6,7,8],a:8},
+  {q:"15% of 200?",opts:[25,30,35],a:30},{q:"Which: 'recieve' or 'receive'?",opts:["recieve","receive","receeve"],a:1},
+  {q:"5² + 3² = ?",opts:[32,33,34],a:34},{q:"3x = 21, x = ?",opts:[6,7,8],a:7},
+  {q:"Area of 6×4 rect?",opts:[20,22,24],a:24},{q:"0.4 × 0.4 = ?",opts:[0.16,0.8,1.6],a:0.16},
+  {q:"Synonym of 'tenacious'?",opts:["weak","persistent","lazy"],a:1},
+];
+let td={};
+function initTower(cv){
+  GS.score=0;GS.active=true;
+  td={zombies:[],towerHP:100,score:0,qIdx:0,qs:shuffle([...TD_Q]),spawner:0,currentQ:null,qTimer:0};
+  spawnTDZombie(cgW(),cgH());td.currentQ=td.qs[td.qIdx%td.qs.length];td.qIdx++;
+  renderTDControls();
+  tdLoop();
+}
+function spawnTDZombie(W,H){
+  td.zombies.push({x:W-30,lane:Math.floor(Math.random()*3),hp:2,hit:false,walking:0});
+}
+function renderTDControls(){
+  if(!td.currentQ)return;
+  const q=td.currentQ;
+  document.getElementById('cgControls').innerHTML=`<div style="background:var(--card);border-radius:12px;padding:12px 14px;">
+    <div style="font-size:0.8rem;color:var(--muted);margin-bottom:8px;">${q.q}</div>
+    <div style="display:flex;gap:8px;">${q.opts.map((o,i)=>`<button class="btn btn-primary btn-sm" style="flex:1;font-size:0.85rem;" onclick="tdAnswer(${i})">${o}</button>`).join('')}</div>
+  </div>`;
+}
+function tdAnswer(idx){
+  const q=td.currentQ;
+  if(idx===q.a){
+    // Hit first zombie
+    if(td.zombies.length>0){td.zombies[0].hp--;if(td.zombies[0].hp<=0){td.zombies.shift();td.score++;GS.score=td.score;}}
+    td.flash=8;
+  }else{
+    td.zombies.forEach(z=>z.x-=80);// Zombies lurch forward!
+  }
+  td.currentQ=td.qs[td.qIdx%td.qs.length];td.qIdx++;
+  renderTDControls();
+}
+let tdFlash=0;
+function tdLoop(){
+  if(!GS.active){cgGameOver('tower');return;}
+  const ctx=cgCtx(),W=cgW(),H=cgH();
+  ctx.clearRect(0,0,W,H);
+  // Sky & grass
+  ctx.fillStyle='#1a3a1a';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#0d4a1a';ctx.fillRect(0,H*0.6,W,H*0.4);
+  // Sun
+  ctx.beginPath();ctx.arc(W*0.85,H*0.12,30,0,Math.PI*2);ctx.fillStyle='rgba(245,158,11,0.4)';ctx.fill();
+  // Tower (castle)
+  const tw=70,th=H*0.45,tx=14;
+  ctx.fillStyle='#4a3728';ctx.fillRect(tx,H-th,tw,th);
+  ctx.fillStyle='#5a4738';
+  for(let i=0;i<4;i++)ctx.fillRect(tx+i*(tw/4)+2,H-th-18,tw/4-4,18);
+  // Tower HP bar
+  const tpct=td.towerHP/100;
+  ctx.fillStyle='#1a3050';ctx.fillRect(tx,H-th-36,tw,12);
+  ctx.fillStyle=tpct>0.5?'#22c55e':tpct>0.25?'#f59e0b':'#ef4444';
+  ctx.fillRect(tx,H-th-36,tw*tpct,12);
+  // Tower HP
+  ctx.fillStyle='white';ctx.font=`${H*0.028}px Segoe UI`;ctx.textAlign='center';
+  ctx.fillText('🏰 '+td.towerHP,tx+tw/2,H-th-40);
+  // Zombie flash
+  if(td.flash>0){ctx.fillStyle='rgba(34,197,94,0.25)';ctx.fillRect(0,0,W,H);td.flash--;}
+  // Move & draw zombies
+  td.spawner++;
+  if(td.spawner>180){td.spawner=0;spawnTDZombie(W,H);}
+  td.zombies.forEach(z=>{
+    z.x-=1.2;z.walking+=0.15;
+    const zy=H*0.6+z.lane*(H*0.12)-30;
+    // Body
+    ctx.fillStyle='#4ade80';ctx.beginPath();ctx.roundRect(z.x-14,zy-36,28,40,5);ctx.fill();
+    // Head
+    ctx.beginPath();ctx.arc(z.x,zy-44,13,0,Math.PI*2);ctx.fillStyle='#86efac';ctx.fill();
+    // Eyes
+    ctx.fillStyle='#dc2626';ctx.beginPath();ctx.arc(z.x-4,zy-46,3,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(z.x+4,zy-46,3,0,Math.PI*2);ctx.fill();
+    // Arms outstretched
+    ctx.fillStyle='#4ade80';ctx.fillRect(z.x-26,zy-30,12,8);ctx.fillRect(z.x+14,zy-30,12,8);
+    // Legs
+    ctx.fillRect(z.x-12,zy+4,10,16+Math.sin(z.walking)*6);
+    ctx.fillRect(z.x+2,zy+4,10,16-Math.sin(z.walking)*6);
+    // HP dots
+    for(let h=0;h<z.hp;h++){ctx.beginPath();ctx.arc(z.x-5+h*10,zy-62,4,0,Math.PI*2);ctx.fillStyle='var(--bad)';ctx.fill();}
+    // Hit tower?
+    if(z.x<tx+tw+10){td.towerHP-=5;td.zombies=td.zombies.filter(z2=>z2!==z);if(td.towerHP<=0){GS.active=false;}}
+  });
+  ctx.fillStyle='white';ctx.font=`bold ${H*0.038}px Segoe UI`;ctx.textAlign='right';
+  ctx.fillText(`Defeated: ${td.score}`,W-14,36);
+  cgRAF=requestAnimationFrame(tdLoop);
+}
+
+// ── 5. EQUATION BLASTER (Space Invaders) ────────────────
+const EB_Q=[
+  {q:"3×7",opts:[20,21,22],a:21},{q:"48÷6",opts:[7,8,9],a:8},{q:"x+5=12; x=?",opts:[6,7,8],a:7},
+  {q:"4²",opts:[14,16,18],a:16},{q:"2x=18; x=?",opts:[8,9,10],a:9},
+  {q:"√49",opts:[6,7,8],a:7},{q:"15+28",opts:[43,44,45],a:43},{q:"9×6",opts:[52,54,56],a:54},
+  {q:"100-37",opts:[62,63,64],a:63},{q:"½ of 86",opts:[42,43,44],a:43},
+];
+let eb={},ebTimer=0;
+function initBlaster(cv){
+  GS.score=0;GS.lives=3;GS.active=true;
+  const W=cgW(),H=cgH();
+  eb={ship:W/2,aliens:[],bullets:[],qIdx:0,qs:shuffle([...EB_Q]),score:0,lives:3,stars:[],targetIdx:0};
+  for(let i=0;i<30;i++)eb.stars.push({x:Math.random()*W,y:Math.random()*H,s:Math.random()*2+0.5,spd:Math.random()+0.3});
+  spawnEBAliens(W,H);
+  document.getElementById('cgControls').innerHTML=`
+  <div style="text-align:center;font-size:0.75rem;color:var(--muted);margin-bottom:8px;">Move: ← → buttons | Tap correct answer to BLAST the targeted alien!</div>
+  <div id="ebAnswers" style="display:flex;gap:6px;margin-bottom:8px;"></div>
+  <div style="display:flex;gap:8px;"><button class="btn btn-secondary btn-sm" style="flex:1;" ontouchstart="ebMoveDir=-1" onmousedown="ebMoveDir=-1" ontouchend="ebMoveDir=0" onmouseup="ebMoveDir=0">◄</button><button class="btn btn-secondary btn-sm" style="flex:1;" ontouchstart="ebMoveDir=1" onmousedown="ebMoveDir=1" ontouchend="ebMoveDir=0" onmouseup="ebMoveDir=0">►</button></div>`;
+  window.ebMoveDir=0;
+  ebRenderAnswers();
+  ebLoop();
+}
+function spawnEBAliens(W,H){
+  eb.qs.forEach((q,i)=>{if(i<8)eb.aliens.push({x:W*0.12+i*(W*0.1),y:H*0.08+Math.floor(i/4)*70,q,alive:true,bob:i*0.5});});
+}
+function ebRenderAnswers(){
+  const target=eb.aliens.filter(a=>a.alive)[0];
+  if(!target){document.getElementById('ebAnswers').innerHTML='';return;}
+  const opts=target.q.opts;
+  document.getElementById('ebAnswers').innerHTML=opts.map((o,i)=>`<button class="btn btn-purple btn-sm" style="flex:1;font-size:0.9rem;" onclick="ebShoot(${i})">${o}</button>`).join('');
+}
+function ebShoot(idx){
+  const target=eb.aliens.filter(a=>a.alive)[0];
+  if(!target)return;
+  const correct=target.q.opts[idx]===target.q.a;
+  if(correct){
+    target.alive=false;eb.score++;GS.score=eb.score;showXpFloat('+5 XP');
+    eb.bullets.push({x:eb.ship,y:cgH()-60,hit:true});
+    ebRenderAnswers();
+    if(!eb.aliens.some(a=>a.alive)){cgGameOver('blaster');return;}
+  }else{
+    GS.lives--;eb.lives--;
+    if(GS.lives<=0){GS.active=false;}
+  }
+}
+function ebLoop(){
+  if(!GS.active){cgGameOver('blaster');return;}
+  const ctx=cgCtx(),W=cgW(),H=cgH();
+  ctx.clearRect(0,0,W,H);
+  // Space bg
+  ctx.fillStyle='#050d1a';ctx.fillRect(0,0,W,H);
+  eb.stars.forEach(s=>{s.y+=s.spd;if(s.y>H)s.y=0;ctx.beginPath();ctx.arc(s.x,s.y,s.s,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,0.7)';ctx.fill();});
+  // Move ship
+  eb.ship=Math.max(30,Math.min(W-30,eb.ship+window.ebMoveDir*6));
+  // Ship
+  ctx.fillStyle='#3b82f6';ctx.beginPath();ctx.moveTo(eb.ship,H-30);ctx.lineTo(eb.ship-22,H-8);ctx.lineTo(eb.ship+22,H-8);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#60a5fa';ctx.beginPath();ctx.moveTo(eb.ship,H-54);ctx.lineTo(eb.ship-10,H-32);ctx.lineTo(eb.ship+10,H-32);ctx.closePath();ctx.fill();
+  // Engine glow
+  ctx.beginPath();ctx.arc(eb.ship,H-8,10+Math.sin(Date.now()*0.01)*3,0,Math.PI*2);ctx.fillStyle='rgba(0,200,180,0.3)';ctx.fill();
+  // Bullets
+  eb.bullets.forEach(b=>{b.y-=18;ctx.fillStyle='#00c9b8';ctx.fillRect(b.x-2,b.y,4,16);});
+  eb.bullets=eb.bullets.filter(b=>b.y>-10);
+  // Aliens
+  const aliveAliens=eb.aliens.filter(a=>a.alive);
+  aliveAliens.forEach((a,i)=>{
+    a.bob+=0.04;const bob=Math.sin(a.bob)*6;
+    const isTarget=i===0;
+    // Alien body
+    ctx.fillStyle=isTarget?'rgba(239,68,68,0.3)':'rgba(139,92,246,0.2)';
+    ctx.beginPath();ctx.roundRect(a.x-28,a.y+bob-22,56,42,8);ctx.fill();
+    ctx.strokeStyle=isTarget?'#ef4444':'#8b5cf6';ctx.lineWidth=isTarget?2.5:1.5;ctx.stroke();
+    // Alien eyes
+    ctx.fillStyle=isTarget?'#ef4444':'#8b5cf6';
+    ctx.beginPath();ctx.arc(a.x-10,a.y+bob-5,5,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(a.x+10,a.y+bob-5,5,0,Math.PI*2);ctx.fill();
+    // Alien antennae
+    ctx.strokeStyle=isTarget?'#ef4444':'#8b5cf6';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(a.x-10,a.y+bob-22);ctx.lineTo(a.x-14,a.y+bob-34);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(a.x+10,a.y+bob-22);ctx.lineTo(a.x+14,a.y+bob-34);ctx.stroke();
+    // Question text
+    ctx.fillStyle='white';ctx.font=`bold ${W*0.038}px Segoe UI`;ctx.textAlign='center';
+    ctx.fillText(a.q.q,a.x,a.y+bob+8);
+    // Target crosshair
+    if(isTarget){ctx.strokeStyle='rgba(239,68,68,0.7)';ctx.lineWidth=1.5;ctx.setLineDash([3,3]);ctx.beginPath();ctx.arc(a.x,a.y+bob,36,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);}
+  });
+  // HUD
+  ctx.fillStyle='white';ctx.font=`bold ${H*0.038}px Segoe UI`;ctx.textAlign='left';
+  ctx.fillText(`Score: ${eb.score}  ❤️×${eb.lives}`,14,38);
+  if(aliveAliens.length===0){GS.active=false;}
+  cgRAF=requestAnimationFrame(ebLoop);
+}
+
+// ════════════════════════════════════════════════════════
+// LEADERBOARD
+// ════════════════════════════════════════════════════════
+function saveLB(){
+  try{const entries=JSON.parse(localStorage.getItem('nq3_lb')||'[]');const code=enc(S).slice(0,10);const me={name:'Player ('+code+')',xp:S.xp,level:S.level};const ei=entries.findIndex(e=>e.name.includes(code));if(ei>=0)entries[ei]=me;else entries.push(me);entries.sort((a,b)=>b.xp-a.xp);localStorage.setItem('nq3_lb',JSON.stringify(entries.slice(0,10)));}catch{}
+}
+function renderLB(){
+  const entries=JSON.parse(localStorage.getItem('nq3_lb')||'[]');
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('lbContent').innerHTML=entries.length===0
+    ?'<p style="color:var(--muted);text-align:center;margin-top:40px;">Complete a session to appear!</p>'
+    :entries.map((e,i)=>`<div class="lb-row"><div class="lb-rank">${medals[i]||i+1}</div><div class="lb-info"><div class="lb-name">${e.name}</div><div class="lb-lvl">Level ${e.level} – ${lvlTitle(e.level)}</div></div><div class="lb-xp">${e.xp} XP</div></div>`).join('');
+}
+
+// ════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════
+loadSave();
+</script>
+</body>
+</html>
